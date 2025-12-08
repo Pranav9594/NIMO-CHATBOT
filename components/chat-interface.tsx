@@ -156,6 +156,28 @@ export function ChatInterface() {
     localStorage.removeItem(STORAGE_KEY)
   }
 
+  const handleEditMessage = (messageId: string, newContent: string) => {
+    const messageIndex = messages.findIndex((m) => m.id === messageId)
+    if (messageIndex === -1) return
+
+    // Keep messages up to and including the edited message, remove all after
+    const updatedMessages = messages.slice(0, messageIndex)
+
+    // Create updated message with new content
+    const editedMessage = {
+      ...messages[messageIndex],
+      parts: [{ type: "text" as const, text: newContent }],
+    }
+
+    // Set messages to include everything before + edited message
+    setMessages([...updatedMessages, editedMessage])
+
+    // Regenerate AI response with the edited message
+    setTimeout(() => {
+      sendMessage({ text: newContent })
+    }, 100)
+  }
+
   const onFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!inputValue.trim() || isLoading) return
@@ -192,7 +214,11 @@ export function ChatInterface() {
       />
 
       <div className="chat-scroll flex-1 overflow-y-auto px-4 py-6 md:px-6">
-        {messages.length === 0 ? <WelcomeScreen /> : <ChatMessages messages={messages} isLoading={isLoading} />}
+        {messages.length === 0 ? (
+          <WelcomeScreen />
+        ) : (
+          <ChatMessages messages={messages} isLoading={isLoading} onEditMessage={handleEditMessage} />
+        )}
         <div ref={messagesEndRef} />
       </div>
 
