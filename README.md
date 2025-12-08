@@ -1,45 +1,43 @@
-NIMO – Conversational AI Chatbot
+## NIMO – Conversational AI Chatbot
 
-A modern conversational AI chatbot built with Next.js, React, and the Vercel AI SDK. NIMO offers a smooth, fast, and interactive chatting experience powered by Groq’s LLaMA 3.3 70B model.
+### NIMO is a modern, feature-packed AI chatbot built with Next.js, React, Tailwind, and the Vercel AI SDK. It delivers a smooth conversational experience powered by Groq’s LLaMA 3.3 70B model, complete with real-time streaming, markdown rendering, chat history, and a sleek dark UI.
 
-Features
+🚀 Features
 Core
 
-Real-time AI conversations using Groq’s LLaMA 3.3 70B
+Real-time conversations powered by LLaMA 3.3 70B
 
-Streaming responses that appear as they're generated
+Fast streaming responses
 
-Full markdown rendering with syntax highlighting for code
+Markdown support with syntax highlighting
 
-One-click copy button for code snippets
+Copy button for code blocks
 
 Chat Management
 
-Automatic chat history stored in local storage
+Chat history stored locally
 
-Up to 20 preserved chat sessions
+Create and switch between multiple sessions
 
-Start new chats anytime
+Restore any of the last 20 conversations
 
-Clear current chat with a confirmation prompt
+Clear individual chats with confirmation
 
-Restore previous chat sessions
-
-Delete individual sessions with confirmation
+Delete specific sessions from history
 
 User Experience
 
-Comet-style animated background
+Animated comet background
 
-Typing indicator while AI generates responses
+Typing indicator while the model is generating
 
-Auto-scroll to latest messages
+Auto-scroll for new messages
 
-Responsive layout for desktop and mobile
+Fully responsive on desktop and mobile
 
-Dark theme with a space-inspired look
+Dark theme with a clean space-inspired feel
 
-Tech Stack
+🛠 Tech Stack
 
 Framework: Next.js 15 (App Router)
 
@@ -47,7 +45,7 @@ Frontend: React 19
 
 Styling: Tailwind CSS 4
 
-SDK: Vercel AI SDK v5
+AI SDK: Vercel AI SDK v5
 
 AI Provider: Groq (LLaMA 3.3 70B)
 
@@ -55,39 +53,41 @@ UI Components: shadcn/ui
 
 Markdown: react-markdown + remark-gfm
 
-Code Highlighting: react-syntax-highlighter
+Syntax Highlighting: react-syntax-highlighter
 
-Project Structure
+📁 Project Structure
 ├── app/
 │   ├── api/
 │   │   └── chat/
-│   │       └── route.ts            # AI chat API endpoint
-│   ├── globals.css                 # Global styles & theme
-│   ├── layout.tsx                  # Root layout
-│   └── page.tsx                    # Main page
+│   │       └── route.ts        # AI chat API endpoint
+│   ├── globals.css             # Global styles & theme
+│   ├── layout.tsx              # Root layout
+│   └── page.tsx                # Main page
+│
 ├── components/
-│   ├── ui/                         # shadcn/ui components
-│   ├── chat-header.tsx             # Header and controls
-│   ├── chat-input.tsx              # Input box
-│   ├── chat-interface.tsx          # Chat container
-│   ├── chat-messages.tsx           # Message list
-│   ├── comet-background.tsx        # Animated background
-│   ├── markdown-renderer.tsx       # Markdown display
-│   ├── message-bubble.tsx          # Individual message bubble
-│   ├── typing-indicator.tsx        # Loading indicator
-│   └── welcome-screen.tsx          # Initial landing screen
+│   ├── ui/                     # shadcn/ui components
+│   ├── chat-header.tsx
+│   ├── chat-input.tsx
+│   ├── chat-interface.tsx
+│   ├── chat-messages.tsx
+│   ├── comet-background.tsx
+│   ├── markdown-renderer.tsx
+│   ├── message-bubble.tsx
+│   ├── typing-indicator.tsx
+│   └── welcome-screen.tsx
+│
 └── README.md
 
-Getting Started
+⚙️ Getting Started
 Prerequisites
 
-Node.js 18 or later
+Node.js 18+
 
-npm, yarn, or pnpm
+npm / yarn / pnpm
 
 Installation
 
-Clone the repo:
+Clone the repository:
 
 git clone https://github.com/yourusername/nimo-chatbot.git
 cd nimo-chatbot
@@ -102,13 +102,14 @@ yarn install
 pnpm install
 
 
-Add your environment variables
-Create .env.local:
+Add your environment variables:
+
+Create a .env.local file:
 
 GROQ_API_KEY=your_groq_api_key_here
 
 
-Start the development server:
+Run the development server:
 
 npm run dev
 # or
@@ -117,17 +118,18 @@ yarn dev
 pnpm dev
 
 
-Open http://localhost:3000 in your browser.
+Open your browser at:
+http://localhost:3000
 
-Environment Variables
+🔑 Environment Variables
 Variable	Description	Required
 GROQ_API_KEY	Groq API key	Yes
-API Reference
+📡 API Reference
 POST /api/chat
 
-Handles AI chat completions.
+Handles chat completions and streams the response.
 
-Request Body
+Request Body:
 
 {
   "messages": [
@@ -141,37 +143,33 @@ Request Body
 }
 
 
-Response
-A Server-Sent Events stream containing chunks of the AI’s response.
+The endpoint returns a Server-Sent Events stream with response chunks.
 
-Customization
+🎯 Customization
 Change the AI Model
 
-In app/api/chat/route.ts:
+app/api/chat/route.ts
 
 const result = streamText({
-  model: groq("llama-3.3-70b-versatile"), // Update model here
+  model: groq("llama-3.3-70b-versatile"), // Change model here
   system: SYSTEM_PROMPT,
-  messages: convertedMessages,
+  messages: convertedMessages
 })
 
-Modify the System Prompt
-
-Located in route.ts:
-
+Edit the System Prompt
 const SYSTEM_PROMPT = `
 You are NIMO, a friendly and helpful AI assistant...
 `
 
 Customize the Theme
 
-Edit CSS variables in app/globals.css:
+Modify variables in app/globals.css:
 
 :root {
   --primary: 174 60% 45%;
   --background: 220 20% 10%;
 }
 
-License
+📄 License
 
-MIT License. Free for personal and commercial use.
+MIT License. You’re free to use this project for personal and commercial work.
