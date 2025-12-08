@@ -71,9 +71,9 @@ cd nimo-chatbot
 ### Install dependencies:
 
 - npm install
-# or
+  or
 - yarn install
-# or
+  or
 - pnpm install
 
 
