@@ -265,11 +265,14 @@ export function ChatInterface() {
 
   if (!isHydrated) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="flex gap-1">
-          <div className="typing-dot h-2 w-2 rounded-full bg-primary" />
-          <div className="typing-dot h-2 w-2 rounded-full bg-primary" />
-          <div className="typing-dot h-2 w-2 rounded-full bg-primary" />
+      <div className="flex h-screen flex-col items-center justify-center gap-4">
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-lg font-semibold text-foreground">NIMO</span>
+          <span className="text-sm text-muted-foreground">Loading your chat...</span>
         </div>
       </div>
     )

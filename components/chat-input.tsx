@@ -2,7 +2,7 @@
 
 import type React from "react"
 import type { FormEvent } from "react"
-import { Send } from "lucide-react"
+import { Send, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -34,11 +34,12 @@ export function ChatInput({ input, isLoading, onInputChange, onSubmit }: ChatInp
             value={input}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message..."
+            placeholder={isLoading ? "Waiting for response..." : "Type your message..."}
             rows={1}
             className={cn(
               "max-h-32 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2 text-sm",
               "placeholder:text-muted-foreground focus:outline-none",
+              isLoading && "opacity-50 cursor-not-allowed",
             )}
             disabled={isLoading}
           />
@@ -48,11 +49,13 @@ export function ChatInput({ input, isLoading, onInputChange, onSubmit }: ChatInp
             disabled={!input.trim() || isLoading}
             className="h-10 w-10 shrink-0 rounded-xl"
           >
-            <Send className="h-4 w-4" />
-            <span className="sr-only">Send message</span>
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            <span className="sr-only">{isLoading ? "Sending..." : "Send message"}</span>
           </Button>
         </div>
-        <p className="mt-2 text-center text-xs text-muted-foreground">Press Enter to send, Shift+Enter for new line</p>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          {isLoading ? "Generating response..." : "Press Enter to send, Shift+Enter for new line"}
+        </p>
       </form>
     </div>
   )
