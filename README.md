@@ -1,173 +1,177 @@
-# NIMO - Conversational AI Chatbot
+NIMO – Conversational AI Chatbot
 
-A modern, feature-rich AI chatbot built with Next.js, React, and the Vercel AI SDK. NIMO provides a sleek conversational interface powered by Groq's LLaMA 3.3 70B model.
+A modern conversational AI chatbot built with Next.js, React, and the Vercel AI SDK. NIMO offers a smooth, fast, and interactive chatting experience powered by Groq’s LLaMA 3.3 70B model.
 
-![NIMO Chatbot](https://via.placeholder.com/800x400?text=NIMO+Chatbot)
+Features
+Core
 
-## Features
+Real-time AI conversations using Groq’s LLaMA 3.3 70B
 
-### Core Features
-- **Real-time AI Conversations**: Powered by Groq's LLaMA 3.3 70B model for fast, intelligent responses
-- **Streaming Responses**: See AI responses as they're generated in real-time
-- **Markdown Support**: Full markdown rendering including code blocks with syntax highlighting
-- **Code Copy Button**: One-click copy for code snippets
+Streaming responses that appear as they're generated
 
-### Chat Management
-- **Chat History**: Automatically saves conversations to local storage
-- **Multiple Sessions**: Manage up to 20 saved chat sessions
-- **New Chat**: Start fresh conversations while preserving history
-- **Clear Chat**: Delete current chat with confirmation dialog
-- **Restore Sessions**: Load previous conversations from history
-- **Delete History**: Remove individual sessions with confirmation
+Full markdown rendering with syntax highlighting for code
 
-### User Experience
-- **Animated Background**: Beautiful comet/shooting star animation
-- **Typing Indicator**: Visual feedback while AI is generating responses
-- **Auto-scroll**: Automatically scrolls to latest messages
-- **Responsive Design**: Works seamlessly on desktop and mobile
-- **Dark Theme**: Easy on the eyes with a space-themed dark interface
+One-click copy button for code snippets
 
-## Tech Stack
+Chat Management
 
-- **Framework**: Next.js 15 (App Router)
-- **UI Library**: React 19
-- **Styling**: Tailwind CSS 4
-- **AI SDK**: Vercel AI SDK v5
-- **AI Provider**: Groq (LLaMA 3.3 70B)
-- **Components**: shadcn/ui
-- **Markdown**: react-markdown with remark-gfm
-- **Syntax Highlighting**: react-syntax-highlighter
+Automatic chat history stored in local storage
 
-## Project Structure
+Up to 20 preserved chat sessions
 
-\`\`\`
+Start new chats anytime
+
+Clear current chat with a confirmation prompt
+
+Restore previous chat sessions
+
+Delete individual sessions with confirmation
+
+User Experience
+
+Comet-style animated background
+
+Typing indicator while AI generates responses
+
+Auto-scroll to latest messages
+
+Responsive layout for desktop and mobile
+
+Dark theme with a space-inspired look
+
+Tech Stack
+
+Framework: Next.js 15 (App Router)
+
+Frontend: React 19
+
+Styling: Tailwind CSS 4
+
+SDK: Vercel AI SDK v5
+
+AI Provider: Groq (LLaMA 3.3 70B)
+
+UI Components: shadcn/ui
+
+Markdown: react-markdown + remark-gfm
+
+Code Highlighting: react-syntax-highlighter
+
+Project Structure
 ├── app/
 │   ├── api/
 │   │   └── chat/
-│   │       └── route.ts          # AI chat API endpoint
-│   ├── globals.css               # Global styles & theme
-│   ├── layout.tsx                # Root layout
-│   └── page.tsx                  # Main page
+│   │       └── route.ts            # AI chat API endpoint
+│   ├── globals.css                 # Global styles & theme
+│   ├── layout.tsx                  # Root layout
+│   └── page.tsx                    # Main page
 ├── components/
-│   ├── ui/                       # shadcn/ui components
-│   ├── chat-header.tsx           # Header with controls
-│   ├── chat-input.tsx            # Message input
-│   ├── chat-interface.tsx        # Main chat container
-│   ├── chat-messages.tsx         # Messages list
-│   ├── comet-background.tsx      # Animated background
-│   ├── markdown-renderer.tsx     # Markdown display
-│   ├── message-bubble.tsx        # Individual message
-│   ├── typing-indicator.tsx      # Loading indicator
-│   └── welcome-screen.tsx        # Initial screen
+│   ├── ui/                         # shadcn/ui components
+│   ├── chat-header.tsx             # Header and controls
+│   ├── chat-input.tsx              # Input box
+│   ├── chat-interface.tsx          # Chat container
+│   ├── chat-messages.tsx           # Message list
+│   ├── comet-background.tsx        # Animated background
+│   ├── markdown-renderer.tsx       # Markdown display
+│   ├── message-bubble.tsx          # Individual message bubble
+│   ├── typing-indicator.tsx        # Loading indicator
+│   └── welcome-screen.tsx          # Initial landing screen
 └── README.md
-\`\`\`
 
-## Getting Started
+Getting Started
+Prerequisites
 
-### Prerequisites
+Node.js 18 or later
 
-- Node.js 18+
-- npm or yarn or pnpm
+npm, yarn, or pnpm
 
-### Installation
+Installation
 
-1. Clone the repository:
-\`\`\`bash
+Clone the repo:
+
 git clone https://github.com/yourusername/nimo-chatbot.git
 cd nimo-chatbot
-\`\`\`
 
-2. Install dependencies:
-\`\`\`bash
+
+Install dependencies:
+
 npm install
 # or
 yarn install
 # or
 pnpm install
-\`\`\`
 
-3. Set up environment variables:
-\`\`\`bash
-# Create a .env.local file
+
+Add your environment variables
+Create .env.local:
+
 GROQ_API_KEY=your_groq_api_key_here
-\`\`\`
 
-4. Run the development server:
-\`\`\`bash
+
+Start the development server:
+
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-\`\`\`
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Environment Variables
+Open http://localhost:3000 in your browser.
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `GROQ_API_KEY` | Your Groq API key | Yes |
+Environment Variables
+Variable	Description	Required
+GROQ_API_KEY	Groq API key	Yes
+API Reference
+POST /api/chat
 
-## API Reference
+Handles AI chat completions.
 
-### POST /api/chat
+Request Body
 
-Handles chat completions with the AI model.
-
-**Request Body:**
-\`\`\`json
 {
   "messages": [
     {
       "role": "user",
-      "parts": [{ "type": "text", "text": "Hello!" }]
+      "parts": [
+        { "type": "text", "text": "Hello!" }
+      ]
     }
   ]
 }
-\`\`\`
 
-**Response:** Server-Sent Events stream with AI response chunks.
 
-## Customization
+Response
+A Server-Sent Events stream containing chunks of the AI’s response.
 
-### Changing the AI Model
+Customization
+Change the AI Model
 
-Edit `app/api/chat/route.ts`:
-\`\`\`typescript
+In app/api/chat/route.ts:
+
 const result = streamText({
-  model: groq("llama-3.3-70b-versatile"), // Change model here
+  model: groq("llama-3.3-70b-versatile"), // Update model here
   system: SYSTEM_PROMPT,
   messages: convertedMessages,
 })
-\`\`\`
 
-### Modifying the System Prompt
+Modify the System Prompt
 
-The system prompt is defined in `app/api/chat/route.ts`:
-\`\`\`typescript
-const SYSTEM_PROMPT = `You are NIMO, a friendly and helpful AI assistant...`
-\`\`\`
+Located in route.ts:
 
-### Customizing the Theme
+const SYSTEM_PROMPT = `
+You are NIMO, a friendly and helpful AI assistant...
+`
 
-Edit the CSS variables in `app/globals.css`:
-\`\`\`css
+Customize the Theme
+
+Edit CSS variables in app/globals.css:
+
 :root {
   --primary: 174 60% 45%;
   --background: 220 20% 10%;
-  /* ... */
 }
-\`\`\`
 
-## License
+License
 
-MIT License - feel free to use this project for personal or commercial purposes.
-
-## Author
-
-Built with care by [Your Name]
-
----
-
-**NIMO** - Your friendly AI companion
+MIT License. Free for personal and commercial use.
