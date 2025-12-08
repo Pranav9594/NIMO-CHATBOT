@@ -2,29 +2,28 @@
 
 ## NIMO is a modern, feature-rich AI chatbot built with Next.js, React, Tailwind, and the Vercel AI SDK. It offers fast real-time conversations powered by Groq’s LLaMA 3.3 70B model, wrapped in a smooth and polished dark UI.
 
-🚀 Features
+## 🚀 Features
 ⚡ Core
 Real-time responses powered by LLaMA 3.3 70B
 Streaming output
 Markdown rendering
 Syntax highlighting with code copy button
 
-💬 Chat Management
-
+## 💬 Chat Management
 Local chat history
 Multiple sessions (up to 20)
 Restore previous chats
 Clear current chat with confirmation
 Delete individual sessions
 
-🪐 User Experience
+## 🪐 User Experience
 Animated comet background
 Typing indicator
 Auto scrolling
 Fully responsive
 Dark theme
 
-🛠 Tech Stack
+## 🛠 Tech Stack
 Next.js 15 (App Router)
 React 19
 Tailwind CSS 4
@@ -34,7 +33,8 @@ shadcn/ui
 react-markdown + remark-gfm
 react-syntax-highlighter
 
-📁 Project Structure
+## 📁 Project Structure
+
 ├── app/
 │   ├── api/
 │   │   └── chat/
@@ -53,16 +53,16 @@ react-syntax-highlighter
 │   ├── markdown-renderer.tsx
 │   ├── message-bubble.tsx
 │   ├── typing-indicator.tsx
-│   └── welcome-screen.tsx
-│
+│   └── welcome-screen.tsx│
 └── README.md
 
 ⚙️ Getting Started
 
-📌 Prerequisites
+## 📌 Prerequisites
 Node.js 18+
 npm / yarn / pnpm
-📥 Installation
+
+## 📥 Installation
 
 Clone the repository:
 
@@ -70,7 +70,8 @@ git clone https://github.com/yourusername/nimo-chatbot.git
 cd nimo-chatbot
 
 
-Install dependencies:
+## Install dependencies:
+
 npm install
 # or
 yarn install
@@ -88,7 +89,8 @@ npm run dev
 
 Open: http://localhost:3000
 
-🔑 Environment Variables
+## 🔑 Environment Variables
+
 Variable	Description	Required
 GROQ_API_KEY	Groq API key	✅ Yes
 📡 API Reference
@@ -107,7 +109,8 @@ Example:
   ]
 }
 
-🎯 Customization
+## 🎯 Customization
+
 🤖 Change the AI Model
 model: groq("llama-3.3-70b-versatile")
 
@@ -116,7 +119,7 @@ const SYSTEM_PROMPT = `
 You are NIMO, a friendly and helpful AI assistant...
 `
 
-🎨 Theme Customization
+## 🎨 Theme Customization
 :root {
   --primary: 174 60% 45%;
   --background: 220 20% 10%;
