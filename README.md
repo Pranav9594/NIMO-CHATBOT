@@ -77,7 +77,7 @@ cd nimo-chatbot
 - pnpm install
 
 
-- Add your environment variables:
+  ## Add your environment variables:
 GROQ_API_KEY=your_groq_api_key_here
 
 
