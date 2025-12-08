@@ -4,36 +4,36 @@
 
 ### 🚀 Features
 ⚡ Core
-Real-time responses powered by LLaMA 3.3 70B
-Streaming output
-Markdown rendering
-Syntax highlighting with code copy button
+- Real-time responses powered by LLaMA 3.3 70B
+- Streaming output
+- Markdown rendering
+- Syntax highlighting with code copy button
 
-## 💬 Chat Management
-Local chat history
-Multiple sessions (up to 20)
-Restore previous chats
-Clear current chat with confirmation
-Delete individual sessions
+### 💬 Chat Management
+- Local chat history
+- Multiple sessions (up to 20)
+- Restore previous chats
+- Clear current chat with confirmation
+- Delete individual sessions
 
-## 🪐 User Experience
-Animated comet background
-Typing indicator
-Auto scrolling
-Fully responsive
-Dark theme
+### 🪐 User Experience
+- Animated comet background
+- Typing indicator
+- Auto scrolling
+- Fully responsive
+- Dark theme
 
-## 🛠 Tech Stack
-Next.js 15 (App Router)
-React 19
-Tailwind CSS 4
-Vercel AI SDK v5
-Groq (LLaMA 3.3 70B)
-shadcn/ui
-react-markdown + remark-gfm
-react-syntax-highlighter
+### 🛠 Tech Stack
+- Next.js 15 (App Router)
+- React 19
+- Tailwind CSS 4
+- Vercel AI SDK v5
+- Groq (LLaMA 3.3 70B)
+- shadcn/ui
+- react-markdown + remark-gfm
+- react-syntax-highlighter
 
-## 📁 Project Structure
+### 📁 Project Structure
 
 ├── app/
 │   ├── api/
@@ -58,11 +58,11 @@ react-syntax-highlighter
 
 ⚙️ Getting Started
 
-## 📌 Prerequisites
-Node.js 18+
-npm / yarn / pnpm
+### 📌 Prerequisites
+- Node.js 18+
+- npm / yarn / pnpm
 
-## 📥 Installation
+### 📥 Installation
 
 Clone the repository:
 
@@ -70,13 +70,13 @@ git clone https://github.com/yourusername/nimo-chatbot.git
 cd nimo-chatbot
 
 
-## Install dependencies:
+### Install dependencies:
 
-npm install
+- npm install
 # or
-yarn install
+- yarn install
 # or
-pnpm install
+- pnpm install
 
 
 Add your environment variables:
@@ -89,7 +89,7 @@ npm run dev
 
 Open: http://localhost:3000
 
-## 🔑 Environment Variables
+### 🔑 Environment Variables
 
 Variable	Description	Required
 GROQ_API_KEY	Groq API key	✅ Yes
@@ -109,17 +109,17 @@ Example:
   ]
 }
 
-## 🎯 Customization
+### 🎯 Customization
 
 🤖 Change the AI Model
-model: groq("llama-3.3-70b-versatile")
+- model: groq("llama-3.3-70b-versatile")
 
 📝 Edit the System Prompt
-const SYSTEM_PROMPT = `
+- const SYSTEM_PROMPT = `
 You are NIMO, a friendly and helpful AI assistant...
 `
 
-## 🎨 Theme Customization
+### 🎨 Theme Customization
 :root {
   --primary: 174 60% 45%;
   --background: 220 20% 10%;
