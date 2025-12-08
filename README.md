@@ -56,14 +56,12 @@
 │   └── welcome-screen.tsx│
 └── README.md
 
-⚙️ Getting Started
-
+- ⚙️ Getting Started
 ### 📌 Prerequisites
 - Node.js 18+
 - npm / yarn / pnpm
 
 ### 📥 Installation
-
 Clone the repository:
 
 git clone https://github.com/yourusername/nimo-chatbot.git
