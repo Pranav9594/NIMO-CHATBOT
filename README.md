@@ -64,7 +64,7 @@
 ### 📥 Installation
 Clone the repository:
 
-git clone https://github.com/yourusername/nimo-chatbot.git
+- git clone https://github.com/yourusername/nimo-chatbot.git
 cd nimo-chatbot
 
 
@@ -77,20 +77,20 @@ cd nimo-chatbot
 - pnpm install
 
 
-Add your environment variables:
+- Add your environment variables:
 GROQ_API_KEY=your_groq_api_key_here
 
 
-Start the dev server:
+- Start the dev server:
 npm run dev
 
 
-Open: http://localhost:3000
+- Open: http://localhost:3000
 
 ### 🔑 Environment Variables
 
 Variable	Description	Required
-GROQ_API_KEY	Groq API key	✅ Yes
+- GROQ_API_KEY	Groq API key	✅ Yes
 📡 API Reference
 POST /api/chat
 
@@ -107,12 +107,12 @@ Example:
   ]
 }
 
-### 🎯 Customization
+# 🎯 Customization
 
-🤖 Change the AI Model
+### 🤖 Change the AI Model
 - model: groq("llama-3.3-70b-versatile")
 
-📝 Edit the System Prompt
+- 📝 Edit the System Prompt
 - const SYSTEM_PROMPT = `
 You are NIMO, a friendly and helpful AI assistant...
 `
