@@ -1,8 +1,13 @@
-import { streamText, convertToModelMessages, type UIMessage } from "ai"
 import { createGroq } from "@ai-sdk/groq"
+import { streamText } from "ai"
+
+interface Message {
+  role: "user" | "assistant" | "system"
+  content: string
+}
 
 const groq = createGroq({
-  apiKey: "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",
+  apiKey: process.env.GROQ_API_KEY,
 })
 
 const SYSTEM_PROMPT = `You are NIMO, a concise and helpful AI coding assistant. You communicate clearly and use Markdown formatting when appropriate.
@@ -15,15 +20,40 @@ Guidelines:
 - Format lists, headers, and emphasis using proper Markdown syntax`
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json()
+  try {
+    const { messages }: { messages: Message[] } = await req.json()
 
-  const prompt = convertToModelMessages(messages)
+    if (!messages || messages.length === 0) {
+      return new Response("No messages provided", { status: 400 })
+    }
 
-  const result = streamText({
-    model: groq("llama-3.3-70b-versatile"),
-    system: SYSTEM_PROMPT,
-    messages: prompt,
-  })
+    const { textStream } = streamText({
+      model: groq("llama-3.3-70b-versatile"),
+      system: SYSTEM_PROMPT,
+      messages: messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      })),
+    })
 
-  return result.toUIMessageStreamResponse()
+    // Create a ReadableStream from the textStream
+    const stream = new ReadableStream({
+      async start(controller) {
+        for await (const chunk of textStream) {
+          // Format as data stream format: 0:"text"\n
+          controller.enqueue(new TextEncoder().encode(`0:${JSON.stringify(chunk)}\n`))
+        }
+        controller.close()
+      },
+    })
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    })
+  } catch (error) {
+    console.error("Chat API error:", error)
+    return new Response("Internal server error", { status: 500 })
+  }
 }

@@ -1,9 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useRef, useState } from "react"
-import { useChat } from "@ai-sdk/react"
-import { DefaultChatTransport } from "ai"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { ChatHeader } from "./chat-header"
 import { ChatMessages } from "./chat-messages"
 import { ChatInput } from "./chat-input"
@@ -12,25 +10,28 @@ import { WelcomeScreen } from "./welcome-screen"
 const STORAGE_KEY = "nimo-chat-history"
 const SESSIONS_KEY = "nimo-chat-sessions"
 
+interface Message {
+  id: string
+  role: "user" | "assistant"
+  content: string
+}
+
 interface ChatSession {
   id: string
   title: string
   timestamp: number
-  messages: any[]
+  messages: Message[]
 }
 
 export function ChatInterface() {
   const [isHydrated, setIsHydrated] = useState(false)
   const [inputValue, setInputValue] = useState("")
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([])
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  const { messages, sendMessage, status, setMessages } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
-  })
-
-  const isLoading = status === "streaming" || status === "submitted"
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     const savedSessions = localStorage.getItem(SESSIONS_KEY)
@@ -57,7 +58,7 @@ export function ChatInterface() {
       }
     }
     setIsHydrated(true)
-  }, [setMessages])
+  }, [])
 
   useEffect(() => {
     if (isHydrated && messages.length > 0) {
@@ -77,21 +78,110 @@ export function ChatInterface() {
     }
   }, [messages, isLoading])
 
+  const getSessionTitle = (messageList: Message[]): string => {
+    const firstUserMessage = messageList.find((m) => m.role === "user")
+    if (!firstUserMessage) return "Chat"
+    const text = firstUserMessage.content || ""
+    if (!text) return "Chat"
+    return text.length > 50 ? text.slice(0, 50) + "..." : text
+  }
+
+  const sendMessage = useCallback(
+    async (userMessage: string) => {
+      if (!userMessage.trim() || isLoading) return
+
+      const userMsg: Message = {
+        id: Date.now().toString(),
+        role: "user",
+        content: userMessage.trim(),
+      }
+
+      setMessages((prev) => [...prev, userMsg])
+      setIsLoading(true)
+
+      const assistantId = (Date.now() + 1).toString()
+      const assistantMsg: Message = {
+        id: assistantId,
+        role: "assistant",
+        content: "",
+      }
+      setMessages((prev) => [...prev, assistantMsg])
+
+      try {
+        abortControllerRef.current = new AbortController()
+
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [...messages, userMsg].map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
+          }),
+          signal: abortControllerRef.current.signal,
+        })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const reader = response.body?.getReader()
+        const decoder = new TextDecoder()
+
+        if (!reader) {
+          throw new Error("No reader available")
+        }
+
+        let fullContent = ""
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value, { stream: true })
+          const lines = chunk.split("\n")
+
+          for (const line of lines) {
+            if (line.startsWith("0:")) {
+              try {
+                const text = JSON.parse(line.slice(2))
+                fullContent += text
+                setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, content: fullContent } : m)))
+              } catch {
+                // Skip invalid JSON
+              }
+            }
+          }
+        }
+      } catch (error) {
+        if ((error as Error).name === "AbortError") {
+          // Request was aborted, do nothing
+        } else {
+          console.error("Error sending message:", error)
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId ? { ...m, content: "Sorry, I encountered an error. Please try again." } : m,
+            ),
+          )
+        }
+      } finally {
+        setIsLoading(false)
+        abortControllerRef.current = null
+      }
+    },
+    [messages, isLoading],
+  )
+
   const handleClearChat = () => {
     if (messages.length > 0) {
-      const firstUserMessage = messages.find((m) => m.role === "user")
-      const title = firstUserMessage
-        ? (firstUserMessage.parts?.[0]?.type === "text" ? firstUserMessage.parts[0].text.slice(0, 50) : "Chat") +
-          (firstUserMessage.parts?.[0]?.text?.length > 50 ? "..." : "")
-        : "Chat"
-
+      const title = getSessionTitle(messages)
       const newSession: ChatSession = {
         id: Date.now().toString(),
         title,
         timestamp: Date.now(),
         messages: messages,
       }
-
       setChatSessions((prev) => [newSession, ...prev].slice(0, 20))
     }
 
@@ -102,12 +192,7 @@ export function ChatInterface() {
 
   const handleLoadSession = (session: ChatSession) => {
     if (messages.length > 0 && currentSessionId !== session.id) {
-      const firstUserMessage = messages.find((m) => m.role === "user")
-      const title = firstUserMessage
-        ? (firstUserMessage.parts?.[0]?.type === "text" ? firstUserMessage.parts[0].text.slice(0, 50) : "Chat") +
-          (firstUserMessage.parts?.[0]?.text?.length > 50 ? "..." : "")
-        : "Chat"
-
+      const title = getSessionTitle(messages)
       const newSession: ChatSession = {
         id: currentSessionId || Date.now().toString(),
         title,
@@ -132,12 +217,7 @@ export function ChatInterface() {
 
   const handleNewChat = () => {
     if (messages.length > 0) {
-      const firstUserMessage = messages.find((m) => m.role === "user")
-      const title = firstUserMessage
-        ? (firstUserMessage.parts?.[0]?.type === "text" ? firstUserMessage.parts[0].text.slice(0, 50) : "Chat") +
-          (firstUserMessage.parts?.[0]?.text?.length > 50 ? "..." : "")
-        : "Chat"
-
+      const title = getSessionTitle(messages)
       const newSession: ChatSession = {
         id: currentSessionId || Date.now().toString(),
         title,
@@ -157,33 +237,26 @@ export function ChatInterface() {
   }
 
   const handleEditMessage = (messageId: string, newContent: string) => {
+    if (isLoading) return
+
     const messageIndex = messages.findIndex((m) => m.id === messageId)
     if (messageIndex === -1) return
 
-    // Keep messages up to and including the edited message, remove all after
-    const updatedMessages = messages.slice(0, messageIndex)
+    const messagesBeforeEdit = messages.slice(0, messageIndex)
+    setMessages(messagesBeforeEdit)
 
-    // Create updated message with new content
-    const editedMessage = {
-      ...messages[messageIndex],
-      parts: [{ type: "text" as const, text: newContent }],
-    }
-
-    // Set messages to include everything before + edited message
-    setMessages([...updatedMessages, editedMessage])
-
-    // Regenerate AI response with the edited message
     setTimeout(() => {
-      sendMessage({ text: newContent })
-    }, 100)
+      sendMessage(newContent)
+    }, 50)
   }
 
   const onFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!inputValue.trim() || isLoading) return
 
-    sendMessage({ text: inputValue.trim() })
+    const message = inputValue.trim()
     setInputValue("")
+    sendMessage(message)
   }
 
   const onInputChange = (value: string) => {

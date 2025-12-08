@@ -1,37 +1,40 @@
 "use client"
 
-import type { UIMessage } from "ai"
+import type React from "react"
 import { Bot, User, Pencil, Check, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { MarkdownRenderer } from "./markdown-renderer"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 
-interface MessageBubbleProps {
-  message: UIMessage
-  onEdit?: (messageId: string, newContent: string) => void
+interface Message {
+  id: string
+  role: "user" | "assistant"
+  content: string
 }
 
-function getMessageContent(message: UIMessage): string {
-  if (message.parts && message.parts.length > 0) {
-    return message.parts
-      .filter((part) => part.type === "text")
-      .map((part) => (part as { type: "text"; text: string }).text)
-      .join("")
-  }
-  return (message as any).content || ""
+interface MessageBubbleProps {
+  message: Message
+  onEdit?: (messageId: string, newContent: string) => void
 }
 
 export function MessageBubble({ message, onEdit }: MessageBubbleProps) {
   const isUser = message.role === "user"
-  const content = getMessageContent(message)
+  const content = message.content || ""
   const [isEditing, setIsEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(content)
 
+  useEffect(() => {
+    setEditedContent(content)
+  }, [content])
+
   const handleSaveEdit = () => {
-    if (editedContent.trim() && onEdit) {
-      onEdit(message.id, editedContent.trim())
+    const trimmed = editedContent.trim()
+    if (trimmed && trimmed !== content && onEdit) {
+      onEdit(message.id, trimmed)
+      setIsEditing(false)
+    } else if (trimmed === content) {
       setIsEditing(false)
     }
   }
@@ -39,6 +42,14 @@ export function MessageBubble({ message, onEdit }: MessageBubbleProps) {
   const handleCancelEdit = () => {
     setEditedContent(content)
     setIsEditing(false)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Escape") {
+      handleCancelEdit()
+    } else if (e.key === "Enter" && e.ctrlKey) {
+      handleSaveEdit()
+    }
   }
 
   return (
@@ -68,8 +79,10 @@ export function MessageBubble({ message, onEdit }: MessageBubbleProps) {
               <Textarea
                 value={editedContent}
                 onChange={(e) => setEditedContent(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="min-h-[60px] bg-background text-foreground border-border resize-none"
                 autoFocus
+                placeholder="Edit your message..."
               />
               <div className="flex gap-2 justify-end">
                 <Button
@@ -81,11 +94,12 @@ export function MessageBubble({ message, onEdit }: MessageBubbleProps) {
                   <X className="h-4 w-4 mr-1" />
                   Cancel
                 </Button>
-                <Button size="sm" onClick={handleSaveEdit} className="h-7 px-2">
+                <Button size="sm" onClick={handleSaveEdit} className="h-7 px-2" disabled={!editedContent.trim()}>
                   <Check className="h-4 w-4 mr-1" />
                   Save
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground">Ctrl+Enter to save, Esc to cancel</p>
             </div>
           ) : isUser ? (
             <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>

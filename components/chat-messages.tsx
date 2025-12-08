@@ -1,11 +1,16 @@
 "use client"
 
-import type { UIMessage } from "ai"
 import { MessageBubble } from "./message-bubble"
 import { TypingIndicator } from "./typing-indicator"
 
+interface Message {
+  id: string
+  role: "user" | "assistant"
+  content: string
+}
+
 interface ChatMessagesProps {
-  messages: UIMessage[]
+  messages: Message[]
   isLoading: boolean
   onEditMessage?: (messageId: string, newContent: string) => void
 }
