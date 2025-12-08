@@ -7,10 +7,12 @@ export function TypingIndicator() {
         <Bot className="h-4 w-4 text-secondary-foreground" />
       </div>
 
-      <div className="flex items-center gap-1 rounded-2xl border border-border bg-card px-4 py-3 shadow-sm">
-        <div className="typing-dot h-2 w-2 rounded-full bg-muted-foreground" />
-        <div className="typing-dot h-2 w-2 rounded-full bg-muted-foreground" />
-        <div className="typing-dot h-2 w-2 rounded-full bg-muted-foreground" />
+      <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-sm">
+        <div className="relative h-5 w-5">
+          <div className="absolute inset-0 rounded-full border-2 border-muted-foreground/20" />
+          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary animate-spin" />
+        </div>
+        <span className="text-sm text-muted-foreground">Generating response...</span>
       </div>
     </div>
   )
