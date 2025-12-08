@@ -34,8 +34,13 @@
 - react-markdown + remark-gfm
 - react-syntax-highlighter
 
-### 📁 Project Structure
+Here’s a cleaner, more polished version of your project README section. It keeps everything simple, structured, and easy to follow.
 
+---
+
+# 📦 Project Structure
+
+```
 ├── app/
 │   ├── api/
 │   │   └── chat/
@@ -54,51 +59,83 @@
 │   ├── markdown-renderer.tsx
 │   ├── message-bubble.tsx
 │   ├── typing-indicator.tsx
-│   └── welcome-screen.tsx│
+│   └── welcome-screen.tsx
+│
 └── README.md
+```
 
-- ⚙️ Getting Started
-### 📌 Prerequisites
-- Node.js 18+
-- npm / yarn / pnpm
+---
 
-### 📥 Installation
+# ⚙️ Getting Started
+
+## 📌 Prerequisites
+
+* Node.js 18 or higher
+* npm, yarn, or pnpm
+
+---
+
+## 📥 Installation
+
 Clone the repository:
 
-- git clone https://github.com/yourusername/nimo-chatbot.git
+```
+git clone https://github.com/yourusername/nimo-chatbot.git
 cd nimo-chatbot
+```
 
+Install dependencies:
 
-### Install dependencies:
+```
+npm install
+```
 
-- npm install
-  or
-- yarn install
-  or
-- pnpm install
+or
 
+```
+yarn install
+```
 
-  ## Add your environment variables:
+or
+
+```
+pnpm install
+```
+
+Add your environment variable in `.env`:
+
+```
 GROQ_API_KEY=your_groq_api_key_here
+```
 
+Start the development server:
 
-- Start the dev server:
+```
 npm run dev
+```
 
+Open the app in your browser:
+[http://localhost:3000](http://localhost:3000)
 
-- Open: http://localhost:3000
+---
 
-### 🔑 Environment Variables
+# 🔑 Environment Variables
 
-Variable	Description	Required
-- GROQ_API_KEY	Groq API key	✅ Yes
-📡 API Reference
-POST /api/chat
+| Variable     | Description  | Required |
+| ------------ | ------------ | -------- |
+| GROQ_API_KEY | Groq API key | Yes      |
 
-Handles streaming chat completions.
+---
 
-Example:
+# 📡 API Reference
 
+### **POST** `/api/chat`
+
+Handles streaming chat messages.
+
+Example request:
+
+```json
 {
   "messages": [
     {
@@ -107,23 +144,45 @@ Example:
     }
   ]
 }
+```
+
+---
 
 # 🎯 Customization
 
-### 🤖 Change the AI Model
-- model: groq("llama-3.3-70b-versatile")
+## 🤖 Change the AI Model
 
-- 📝 Edit the System Prompt
-- const SYSTEM_PROMPT = `
+In `route.ts`:
+
+```ts
+model: groq("llama-3.3-70b-versatile")
+```
+
+## 📝 Edit the System Prompt
+
+Inside your API route:
+
+```ts
+const SYSTEM_PROMPT = `
 You are NIMO, a friendly and helpful AI assistant...
 `
+```
 
-### 🎨 Theme Customization
+## 🎨 Theme Customization
+
+Modify global theme variables:
+
+```css
 :root {
   --primary: 174 60% 45%;
   --background: 220 20% 10%;
 }
+```
 
-📄 License
+---
 
-MIT License
+# 📄 License
+
+This project is open-source and available under the MIT License.
+
+---
