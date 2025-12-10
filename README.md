@@ -9,21 +9,21 @@
 - Streaming output
 - Markdown rendering
 - Syntax highlighting with code copy button
-
+---
 ### 💬 Chat Management
 - Local chat history
 - Multiple sessions (up to 20)
 - Restore previous chats
 - Clear current chat with confirmation
 - Delete individual sessions
-
+---
 ### 🪐 User Experience
 - Animated comet background
 - Typing indicator
 - Auto scrolling
 - Fully responsive
 - Dark theme
-
+---
 ### 🛠 Tech Stack
 - Next.js 15 (App Router)
 - React 19
@@ -33,7 +33,7 @@
 - shadcn/ui
 - react-markdown + remark-gfm
 - react-syntax-highlighter
-
+---
 Here’s a cleaner, more polished version of your project README section. It keeps everything simple, structured, and easy to follow.
 
 ---
