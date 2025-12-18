@@ -1,4 +1,4 @@
-a# ✨ NIMO – Conversational AI Chatbot
+aa# ✨ NIMO – Conversational AI Chatbot
 <img width="1445" height="831" alt="Screenshot 2025-12-08 232152" src="https://github.com/user-attachments/assets/0394c3d3-48bf-461f-a9db-eba53a2fa53d" />
 
 ### NIMO is a modern, feature-rich AI chatbot built with Next.js, React, Tailwind, and the Vercel AI SDK. It offers fast real-time conversations powered by Groq’s LLaMA 3.3 70B model, wrapped in a smooth and polished dark UI.
