@@ -26,7 +26,8 @@ export function MessageBubble({ message, onEdit }: MessageBubbleProps) {
   const [editedContent, setEditedContent] = useState(content)
 
   useEffect(() => {
-    setEditedContent(content)
+    const frame = window.requestAnimationFrame(() => setEditedContent(content))
+    return () => window.cancelAnimationFrame(frame)
   }, [content])
 
   const handleSaveEdit = () => {

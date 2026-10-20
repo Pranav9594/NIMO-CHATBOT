@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
+import path from "node:path"
+
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
+  turbopack: {
+    root: path.resolve(process.cwd()),
   },
   images: {
     unoptimized: true,

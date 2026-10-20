@@ -1,7 +1,7 @@
 # ✨ NIMO – Conversational AI Chatbot
 <img width="1445" height="831" alt="" />
 
-### NIMO is a modern, feature-rich AI chatbot built with Next.js, React, Tailwind, and the Vercel AI SDK. It offers fast real-time conversations powered by Groq’s LLaMA 3.3 70B model, wrapped in a smooth and polished dark UI.
+### NIMO is a modern, feature-rich AI chatbot built with Next.js, React, Tailwind, and Gemini. It offers natural conversations for questions, ideas, writing, learning, planning, and everyday tasks in a smooth and polished dark UI.
 
 ### 🚀 Features
 ⚡ Core
@@ -102,10 +102,10 @@ or
 pnpm install
 ```
 
-Add your environment variable in `.env`:
+Add your environment variable in `.env.local`:
 
 ```
-GROQ_API_KEY=your_groq_api_key_here
+GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here
 ```
 
 Start the development server:
@@ -123,7 +123,7 @@ Open the app in your browser:
 
 | Variable     | Description  | Required |
 | ------------ | ------------ | -------- |
-| GROQ_API_KEY | Groq API key | Yes      |
+| GOOGLE_GENERATIVE_AI_API_KEY | Google Gemini API key | Yes      |
 
 ---
 

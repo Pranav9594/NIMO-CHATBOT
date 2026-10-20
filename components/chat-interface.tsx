@@ -34,30 +34,34 @@ export function ChatInterface() {
   const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
-    const savedSessions = localStorage.getItem(SESSIONS_KEY)
-    if (savedSessions) {
-      try {
-        const parsed = JSON.parse(savedSessions)
-        if (Array.isArray(parsed)) {
-          setChatSessions(parsed)
+    const timer = window.setTimeout(() => {
+      const savedSessions = localStorage.getItem(SESSIONS_KEY)
+      if (savedSessions) {
+        try {
+          const parsed = JSON.parse(savedSessions)
+          if (Array.isArray(parsed)) {
+            setChatSessions(parsed)
+          }
+        } catch (e) {
+          console.error("Failed to parse saved sessions:", e)
         }
-      } catch (e) {
-        console.error("Failed to parse saved sessions:", e)
       }
-    }
 
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setMessages(parsed)
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMessages(parsed)
+          }
+        } catch (e) {
+          console.error("Failed to parse saved messages:", e)
         }
-      } catch (e) {
-        console.error("Failed to parse saved messages:", e)
       }
-    }
-    setIsHydrated(true)
+      setIsHydrated(true)
+    }, 0)
+
+    return () => window.clearTimeout(timer)
   }, [])
 
   useEffect(() => {
