@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Bot, Trash2, History, X, Plus, ArrowUpRight } from "lucide-react"
+import { Bot, Trash2, X, Plus, ArrowUpRight, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -80,6 +80,15 @@ export function ChatHeader({
     <>
       <header className="mx-4 mt-4 flex items-center justify-between rounded-full border border-orange-300/15 bg-[#1d1009]/75 px-4 py-2.5 backdrop-blur-md md:mx-8 md:px-6">
         <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowHistoryDialog(true)}
+            className="h-9 w-9 rounded-full text-orange-100/80 hover:bg-orange-400/10 hover:text-orange-50"
+          >
+            <Menu className="h-4 w-4" />
+            <span className="sr-only">Open chat history</span>
+          </Button>
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-orange-300 via-orange-500 to-orange-800 shadow-[0_0_22px_rgba(245,100,24,0.45)]">
             <Bot className="h-4 w-4 text-[#241006]" />
           </div>
@@ -88,26 +97,10 @@ export function ChatHeader({
           </div>
         </div>
 
-        <nav className="hidden items-center gap-7 text-[11px] uppercase tracking-[0.16em] text-orange-100/55 md:flex">
-          <span className="text-orange-100">Workspace</span>
-          <span>Capabilities</span>
-          <span>Pricing</span>
-        </nav>
-
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={onNewChat} className="text-muted-foreground hover:text-foreground">
             <Plus className="mr-2 h-4 w-4" />
             New Chat
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowHistoryDialog(true)}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <History className="mr-2 h-4 w-4" />
-            History
           </Button>
 
           {hasMessages && (
