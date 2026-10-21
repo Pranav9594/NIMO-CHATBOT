@@ -18,7 +18,7 @@
 - Delete individual sessions
 ---
 ### 🪐 User Experience
-- Animated comet background
+- Animated shooting-star background
 - Typing indicator
 - Auto scrolling
 - Fully responsive
@@ -55,7 +55,6 @@ Here’s a cleaner, more polished version of your project README section. It kee
 │   ├── chat-input.tsx
 │   ├── chat-interface.tsx
 │   ├── chat-messages.tsx
-│   ├── comet-background.tsx
 │   ├── markdown-renderer.tsx
 │   ├── message-bubble.tsx
 │   ├── typing-indicator.tsx
