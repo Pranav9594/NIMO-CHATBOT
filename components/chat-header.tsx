@@ -78,19 +78,19 @@ export function ChatHeader({
 
   return (
     <>
-      <header className="mx-4 mt-4 flex items-center justify-between rounded-full border border-orange-300/15 bg-[#1d1009]/75 px-4 py-2.5 backdrop-blur-md md:mx-8 md:px-6">
+      <header className="mx-3 mt-3 flex items-center justify-between rounded-2xl border border-orange-300/15 bg-[#1d1009]/75 px-4 py-3 backdrop-blur-md sm:mx-5 md:mx-8 md:px-7 md:hidden">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setShowHistoryDialog(true)}
-            className="h-9 w-9 rounded-full text-orange-100/80 hover:bg-orange-400/10 hover:text-orange-50"
+            className="h-10 w-10 rounded-xl text-orange-100/80 hover:bg-orange-400/10 hover:text-orange-50"
           >
-            <Menu className="h-4 w-4" />
+            <Menu className="h-5 w-5" />
             <span className="sr-only">Open chat history</span>
           </Button>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-orange-300 via-orange-500 to-orange-800 shadow-[0_0_22px_rgba(245,100,24,0.45)]">
-            <Bot className="h-4 w-4 text-[#241006]" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-300 via-orange-500 to-orange-800 shadow-[0_0_22px_rgba(245,100,24,0.45)]">
+            <Bot className="h-5 w-5 text-[#241006]" />
           </div>
           <div>
             <h1 className="text-sm font-semibold tracking-[0.2em] text-orange-50">NIMO</h1>

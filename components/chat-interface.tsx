@@ -2,9 +2,10 @@
 
 import type React from "react"
 import { useEffect, useRef, useState, useCallback } from "react"
+import { Bot, FileCode2, FolderKanban, Menu, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus, Settings2, Sparkles } from "lucide-react"
 import { ChatHeader } from "./chat-header"
 import { ChatMessages } from "./chat-messages"
-import { ChatInput } from "./chat-input"
+import { ChatInput, type ChatAttachment } from "./chat-input"
 import { WelcomeScreen } from "./welcome-screen"
 
 const STORAGE_KEY = "nimo-chat-history"
@@ -26,10 +27,12 @@ interface ChatSession {
 export function ChatInterface() {
   const [isHydrated, setIsHydrated] = useState(false)
   const [inputValue, setInputValue] = useState("")
+  const [attachments, setAttachments] = useState<ChatAttachment[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([])
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
@@ -91,13 +94,16 @@ export function ChatInterface() {
   }
 
   const sendMessage = useCallback(
-    async (userMessage: string) => {
+    async (userMessage: string, messageAttachments: ChatAttachment[] = []) => {
       if (!userMessage.trim() || isLoading) return
 
+      const attachmentContext = messageAttachments
+        .map((attachment) => `\n\n[Attached document: ${attachment.name}]\n${attachment.text}`)
+        .join("")
       const userMsg: Message = {
         id: Date.now().toString(),
         role: "user",
-        content: userMessage.trim(),
+        content: `${userMessage.trim()}${attachmentContext}`,
       }
 
       // Build a local message list to avoid relying on possibly-stale state
@@ -204,9 +210,9 @@ export function ChatInterface() {
     if (messages.length > 0 && currentSessionId !== session.id) {
       const title = getSessionTitle(messages)
       const newSession: ChatSession = {
-        id: currentSessionId || Date.now().toString(),
+        id: currentSessionId || messages[0]?.id || "session",
         title,
-        timestamp: Date.now(),
+        timestamp: messages.length,
         messages: messages,
       }
 
@@ -262,11 +268,13 @@ export function ChatInterface() {
 
   const onFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!inputValue.trim() || isLoading) return
+    if ((!inputValue.trim() && attachments.length === 0) || isLoading) return
 
-    const message = inputValue.trim()
+    const message = inputValue.trim() || "Please analyze the attached document."
+    const messageAttachments = attachments
     setInputValue("")
-    sendMessage(message)
+    setAttachments([])
+    sendMessage(message, messageAttachments)
   }
 
   const onInputChange = (value: string) => {
@@ -289,26 +297,129 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="mx-auto flex h-screen max-w-4xl flex-col">
-      <ChatHeader
-        onClear={handleClearChat}
-        hasMessages={messages.length > 0}
-        chatSessions={chatSessions}
-        onLoadSession={handleLoadSession}
-        onDeleteSession={handleDeleteSession}
-        onNewChat={handleNewChat}
-      />
+    <div className="mx-auto flex h-screen w-full max-w-[1600px]">
+      <aside
+        className={`hidden shrink-0 flex-col border-r border-orange-300/10 bg-[#120b07]/90 py-5 transition-[width] duration-200 md:flex ${
+          isSidebarCollapsed ? "w-[72px] px-2" : "w-72 px-3"
+        }`}
+      >
+        <div className={`mb-6 flex items-center ${isSidebarCollapsed ? "justify-center" : "justify-between px-3"}`}>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-300 via-orange-500 to-orange-800">
+            <Bot className="h-5 w-5 text-[#241006]" />
+          </div>
+          {!isSidebarCollapsed && <span className="text-xl font-semibold tracking-tight text-orange-50">NIMO</span>}
+          <button
+            type="button"
+            onClick={() => setIsSidebarCollapsed((collapsed) => !collapsed)}
+            className="rounded-lg p-2 text-orange-100/55 transition hover:bg-orange-400/10 hover:text-orange-50"
+            title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isSidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
+        </div>
 
-      <div className="chat-scroll flex-1 overflow-y-auto px-4 py-6 md:px-6">
-        {messages.length === 0 ? (
-          <WelcomeScreen />
-        ) : (
-          <ChatMessages messages={messages} isLoading={isLoading} onEditMessage={handleEditMessage} />
-        )}
-        <div ref={messagesEndRef} />
+        <button
+          type="button"
+          onClick={handleNewChat}
+          className={`mb-3 flex h-11 items-center rounded-xl bg-orange-500 text-sm font-semibold text-orange-950 transition hover:bg-orange-400 ${
+            isSidebarCollapsed ? "justify-center px-0" : "gap-3 px-4"
+          }`}
+          title="New chat"
+        >
+          <Plus className="h-5 w-5" />
+          {!isSidebarCollapsed && "New chat"}
+        </button>
+
+        <div className="space-y-1 text-sm text-orange-100/65">
+          <div className={`flex items-center rounded-lg py-2.5 text-orange-100/85 ${isSidebarCollapsed ? "justify-center" : "gap-3 px-3"}`} title="Chats">
+            <MessageSquare className="h-4 w-4" />
+            {!isSidebarCollapsed && "Chats"}
+          </div>
+          <div className={`flex items-center rounded-lg py-2.5 hover:bg-orange-400/10 ${isSidebarCollapsed ? "justify-center" : "gap-3 px-3"}`} title="Projects">
+            <FolderKanban className="h-4 w-4" />
+            {!isSidebarCollapsed && "Projects"}
+          </div>
+          <div className={`flex items-center rounded-lg py-2.5 hover:bg-orange-400/10 ${isSidebarCollapsed ? "justify-center" : "gap-3 px-3"}`} title="Artifacts">
+            <FileCode2 className="h-4 w-4" />
+            {!isSidebarCollapsed && "Artifacts"}
+          </div>
+        </div>
+
+        <div className="mt-8 flex min-h-0 flex-1 flex-col">
+          {!isSidebarCollapsed && (
+            <div className="mb-3 flex items-center justify-between px-3 text-xs font-semibold uppercase tracking-[0.16em] text-orange-100/35">
+              Recent chats
+              <Sparkles className="h-3.5 w-3.5" />
+            </div>
+          )}
+          <div className="chat-scroll space-y-1 overflow-y-auto">
+            {isSidebarCollapsed ? (
+              <div className="flex flex-col items-center gap-3 pt-2">
+                <Menu className="h-4 w-4 text-orange-100/35" />
+                {chatSessions.slice(0, 5).map((session) => (
+                  <button
+                    type="button"
+                    key={session.id}
+                    onClick={() => handleLoadSession(session)}
+                    className="h-2 w-2 rounded-full bg-orange-400/60 transition hover:scale-125 hover:bg-orange-300"
+                    title={session.title}
+                    aria-label={`Open chat: ${session.title}`}
+                  />
+                ))}
+              </div>
+            ) : chatSessions.length === 0 ? (
+              <p className="px-3 py-4 text-xs leading-5 text-orange-100/35">Your conversations will appear here.</p>
+            ) : (
+              chatSessions.map((session) => (
+                <button
+                  type="button"
+                  key={session.id}
+                  onClick={() => handleLoadSession(session)}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-orange-100/60 transition hover:bg-orange-400/10 hover:text-orange-50"
+                >
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400/60" />
+                  <span className="truncate">{session.title}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className={`mt-4 flex items-center border-t border-orange-300/10 pt-4 text-sm text-orange-100/60 ${isSidebarCollapsed ? "justify-center" : "justify-between px-3"}`}>
+          {!isSidebarCollapsed && <span>Pranav · Free</span>}
+          <Settings2 className="h-4 w-4" />
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <ChatHeader
+          onClear={handleClearChat}
+          hasMessages={messages.length > 0}
+          chatSessions={chatSessions}
+          onLoadSession={handleLoadSession}
+          onDeleteSession={handleDeleteSession}
+          onNewChat={handleNewChat}
+        />
+
+        <div className="chat-scroll flex-1 overflow-y-auto px-4 py-6 sm:px-8 md:px-12">
+          {messages.length === 0 ? (
+            <WelcomeScreen />
+          ) : (
+            <ChatMessages messages={messages} isLoading={isLoading} onEditMessage={handleEditMessage} />
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <ChatInput
+          input={inputValue}
+          isLoading={isLoading}
+          onInputChange={onInputChange}
+          onSubmit={onFormSubmit}
+          attachments={attachments}
+          onAttachmentsChange={setAttachments}
+        />
       </div>
-
-      <ChatInput input={inputValue} isLoading={isLoading} onInputChange={onInputChange} onSubmit={onFormSubmit} />
     </div>
   )
 }

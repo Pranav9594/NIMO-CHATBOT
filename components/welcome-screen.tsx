@@ -17,7 +17,7 @@ export function WelcomeScreen() {
         NIMO helps you explore ideas, get clear answers, and move forward with confidence.
       </p>
 
-      <div className="grid w-full max-w-2xl gap-3 text-left md:grid-cols-2">
+      <div className="-mt-4 grid w-full max-w-2xl gap-3 text-left md:grid-cols-2">
         <div className="orange-card rounded-2xl p-5 transition-all duration-300">
           <div className="mb-5 flex items-center justify-between">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-400/15">

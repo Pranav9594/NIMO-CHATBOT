@@ -45,13 +45,13 @@ export async function POST(req: Request) {
       .map((message) => `${message.role === "user" ? "User" : "NIMO"}: ${message.content}`)
       .join("\n\n")
     const prompt = `${SYSTEM_PROMPT}\n\nConversation:\n${conversation}\n\nNIMO:`
-    const models = ["gemini-3.6-flash", "gemini-3-flash-preview", "gemini-3.5-flash"]
+    const configuredModel = process.env.GEMINI_MODEL || "gemini-3.8-flash"
+    const models = [...new Set([configuredModel, "gemini-3.8-flash"])]
     let response: Response | null = null
-    let lastError = "Gemini is temporarily unavailable."
 
     for (const model of models) {
-      for (let attempt = 0; attempt < 2; attempt += 1) {
-        const candidateResponse = await fetch(
+      const request = () =>
+        fetch(
           `https://generativelanguage.googleapis.com/v1beta/interactions?key=${encodeURIComponent(apiKey)}`,
           {
             method: "POST",
@@ -64,26 +64,27 @@ export async function POST(req: Request) {
           },
         )
 
-        if (candidateResponse.ok) {
-          response = candidateResponse
-          break
-        }
-
-        lastError = await candidateResponse.text()
-        console.error(`Gemini API error for ${model}:`, candidateResponse.status, lastError)
-
-        if ((candidateResponse.status === 429 || candidateResponse.status === 503) && attempt === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 800))
-          continue
-        }
-
-        break
+      response = await request()
+      if (!response.ok && (response.status === 429 || response.status === 503)) {
+        console.warn(`Gemini API temporarily unavailable for ${model}; retrying once.`)
+        response = await request()
       }
 
-      if (response) break
+      if (response.ok) break
+
+      const errorText = await response.text()
+      console.error(`Gemini API error for ${model}:`, response.status, errorText)
+      response = null
     }
 
     if (!response) {
+      return new Response(
+        "Gemini is temporarily busy. Please wait a moment and try again.",
+        { status: 503 },
+      )
+    }
+
+    if (!response.ok) {
       return new Response(
         "Gemini is temporarily busy. Please wait a moment and try again.",
         { status: 503 },
@@ -99,7 +100,7 @@ export async function POST(req: Request) {
         .flatMap((step) => step.content ?? [])
         .filter((part) => part.type === "text")
         .map((part) => part.text ?? "")
-        .join("") || lastError || "Gemini returned an empty response."
+        .join("") || "Gemini returned an empty response."
 
     const readable = new ReadableStream({
       start(controller) {

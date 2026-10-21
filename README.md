@@ -20,6 +20,8 @@
 ### 🪐 User Experience
 - Animated shooting-star background
 - Typing indicator
+- Voice typing from the chat composer
+- Text document attachments (TXT, Markdown, CSV, JSON, HTML, XML, and source files)
 - Auto scrolling
 - Fully responsive
 - Dark theme
@@ -105,6 +107,8 @@ Add your environment variable in `.env.local`:
 
 ```
 GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here
+# Optional: use a different Gemini model
+GEMINI_MODEL=gemini-3.8-flash
 ```
 
 Start the development server:
@@ -123,6 +127,7 @@ Open the app in your browser:
 | Variable     | Description  | Required |
 | ------------ | ------------ | -------- |
 | GOOGLE_GENERATIVE_AI_API_KEY | Google Gemini API key | Yes      |
+| GEMINI_MODEL | Gemini model used for faster responses | No       |
 
 ---
 

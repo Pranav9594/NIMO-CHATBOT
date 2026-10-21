@@ -84,12 +84,21 @@ function formatInlineMarkdown(text: string): string {
         /`([^`]+)`/g,
         '<code class="rounded bg-code-bg px-1.5 py-0.5 font-mono text-xs text-code-foreground">$1</code>',
       )
+      // Headers
+      .replace(/^(#{1,6})\s+(.*?)$/gm, (_, hashes, heading) => {
+        const level = hashes.length
+        const sizeClass =
+          level === 1
+            ? "text-xl"
+            : level === 2
+              ? "text-lg"
+              : level === 3
+                ? "text-base"
+                : "text-sm"
+        return `<h${level} class="${sizeClass} font-semibold mt-4 mb-2">${heading}</h${level}>`
+      })
       // Line breaks
       .replace(/\n/g, "<br />")
-      // Headers
-      .replace(/^### (.*?)$/gm, '<h3 class="text-base font-semibold mt-4 mb-2">$1</h3>')
-      .replace(/^## (.*?)$/gm, '<h2 class="text-lg font-semibold mt-4 mb-2">$1</h2>')
-      .replace(/^# (.*?)$/gm, '<h1 class="text-xl font-semibold mt-4 mb-2">$1</h1>')
       // Lists
       .replace(/^- (.*?)$/gm, '<li class="ml-4 list-disc">$1</li>')
       .replace(/^(\d+)\. (.*?)$/gm, '<li class="ml-4 list-decimal">$2</li>')
