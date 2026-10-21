@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { Bot, User, Pencil, Check, X } from "lucide-react"
+import { Pencil, Check, X, Copy } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { MarkdownRenderer } from "./markdown-renderer"
 import { useState, useEffect } from "react"
@@ -24,6 +24,8 @@ export function MessageBubble({ message, onEdit }: MessageBubbleProps) {
   const content = message.content || ""
   const [isEditing, setIsEditing] = useState(false)
   const [editedContent, setEditedContent] = useState(content)
+  const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState(false)
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => setEditedContent(content))
@@ -53,21 +55,20 @@ export function MessageBubble({ message, onEdit }: MessageBubbleProps) {
     }
   }
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(content)
+      setCopied(true)
+      setCopyError(false)
+      window.setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error("Failed to copy message:", error)
+      setCopyError(true)
+    }
+  }
+
   return (
     <div className={cn("flex gap-3 group", isUser ? "flex-row-reverse" : "flex-row")}>
-      <div
-        className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          isUser ? "bg-primary" : "bg-secondary",
-        )}
-      >
-        {isUser ? (
-          <User className="h-4 w-4 text-primary-foreground" />
-        ) : (
-          <Bot className="h-4 w-4 text-secondary-foreground" />
-        )}
-      </div>
-
       <div className="flex flex-col gap-1 max-w-[80%]">
         <div
           className={cn(
@@ -105,7 +106,27 @@ export function MessageBubble({ message, onEdit }: MessageBubbleProps) {
           ) : isUser ? (
             <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
           ) : (
-            <MarkdownRenderer content={content} />
+            <>
+              <MarkdownRenderer content={content} />
+              {content && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleCopy}
+                  aria-label={copyError ? "Copy failed" : copied ? "Message copied" : "Copy message"}
+                  className="mt-2 h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  {copyError ? (
+                    <X className="mr-1 h-3.5 w-3.5 text-destructive" />
+                  ) : copied ? (
+                    <Check className="mr-1 h-3.5 w-3.5 text-green-500" />
+                  ) : (
+                    <Copy className="mr-1 h-3.5 w-3.5" />
+                  )}
+                  {copyError ? "Copy failed" : copied ? "Copied" : "Copy"}
+                </Button>
+              )}
+            </>
           )}
         </div>
 

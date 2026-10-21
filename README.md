@@ -5,7 +5,7 @@
 
 ### 🚀 Features
 ⚡ Core
-- Real-time responses powered by LLaMA 3.3 70B
+- Real-time responses powered by Gemini
 - Streaming output
 - Markdown rendering
 - Syntax highlighting with code copy button
@@ -108,7 +108,7 @@ Add your environment variable in `.env.local`:
 ```
 GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here
 # Optional: use a different Gemini model
-GEMINI_MODEL=gemini-3.8-flash
+GEMINI_MODEL=gemini-flash-lite-latest
 ```
 
 Start the development server:
@@ -127,7 +127,7 @@ Open the app in your browser:
 | Variable     | Description  | Required |
 | ------------ | ------------ | -------- |
 | GOOGLE_GENERATIVE_AI_API_KEY | Google Gemini API key | Yes      |
-| GEMINI_MODEL | Gemini model used for faster responses | No       |
+| GEMINI_MODEL | Gemini model used for responses | No       |
 
 ---
 
@@ -156,10 +156,10 @@ Example request:
 
 ## 🤖 Change the AI Model
 
-In `route.ts`:
+Set `GEMINI_MODEL` in `.env.local`:
 
 ```ts
-model: groq("llama-3.3-70b-versatile")
+GEMINI_MODEL=gemini-flash-lite-latest
 ```
 
 ## 📝 Edit the System Prompt

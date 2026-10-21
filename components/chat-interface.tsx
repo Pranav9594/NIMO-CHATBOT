@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useRef, useState, useCallback } from "react"
-import { Bot, FileCode2, FolderKanban, Menu, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus, Settings2, Sparkles } from "lucide-react"
+import { Bot, FileCode2, FolderKanban, Menu, MoreHorizontal, PanelLeftClose, PanelLeftOpen, Pin, Plus, Settings2, Sparkles, Trash2, Pencil } from "lucide-react"
 import { ChatHeader } from "./chat-header"
 import { ChatMessages } from "./chat-messages"
 import { ChatInput, type ChatAttachment } from "./chat-input"
@@ -22,6 +22,8 @@ interface ChatSession {
   title: string
   timestamp: number
   messages: Message[]
+  pinned?: boolean
+  archived?: boolean
 }
 
 export function ChatInterface() {
@@ -33,6 +35,7 @@ export function ChatInterface() {
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([])
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [openSessionMenu, setOpenSessionMenu] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
@@ -85,6 +88,27 @@ export function ChatInterface() {
     }
   }, [messages, isLoading])
 
+  useEffect(() => {
+    if (!openSessionMenu) return
+
+    const closeMenu = (event: PointerEvent) => {
+      const target = event.target
+      if (target instanceof Element && !target.closest("[data-session-menu]")) {
+        setOpenSessionMenu(null)
+      }
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenSessionMenu(null)
+    }
+
+    document.addEventListener("pointerdown", closeMenu)
+    document.addEventListener("keydown", handleKeyDown)
+    return () => {
+      document.removeEventListener("pointerdown", closeMenu)
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [openSessionMenu])
+
   const getSessionTitle = (messageList: Message[]): string => {
     const firstUserMessage = messageList.find((m) => m.role === "user")
     if (!firstUserMessage) return "Chat"
@@ -122,8 +146,6 @@ export function ChatInterface() {
       try {
         abortControllerRef.current = new AbortController()
 
-        await new Promise((resolve) => setTimeout(resolve, 1500))
-
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -134,11 +156,16 @@ export function ChatInterface() {
         })
 
         if (!response.ok) {
-          // include response body (if any) for better error visibility
           let bodyText = ""
           try {
             bodyText = await response.text()
           } catch {}
+          if (response.status === 402) {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === assistantId ? { ...m, content: bodyText } : m)),
+            )
+            return
+          }
           throw new Error(`HTTP error! status: ${response.status}${bodyText ? ` - ${bodyText}` : ""}`)
         }
 
@@ -229,6 +256,23 @@ export function ChatInterface() {
 
   const handleDeleteSession = (id: string) => {
     setChatSessions((prev) => prev.filter((s) => s.id !== id))
+    if (currentSessionId === id) {
+      setMessages([])
+      setCurrentSessionId(null)
+    }
+  }
+
+  const handleRenameSession = (session: ChatSession) => {
+    const title = window.prompt("Rename chat", session.title)?.trim()
+    if (title) {
+      setChatSessions((prev) => prev.map((item) => (item.id === session.id ? { ...item, title } : item)))
+    }
+    setOpenSessionMenu(null)
+  }
+
+  const handleTogglePinSession = (session: ChatSession) => {
+    setChatSessions((prev) => prev.map((item) => (item.id === session.id ? { ...item, pinned: !item.pinned } : item)))
+    setOpenSessionMenu(null)
   }
 
   const handleNewChat = () => {
@@ -304,9 +348,6 @@ export function ChatInterface() {
         }`}
       >
         <div className={`mb-6 flex items-center ${isSidebarCollapsed ? "justify-center" : "justify-between px-3"}`}>
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-300 via-orange-500 to-orange-800">
-            <Bot className="h-5 w-5 text-[#241006]" />
-          </div>
           {!isSidebarCollapsed && <span className="text-xl font-semibold tracking-tight text-orange-50">NIMO</span>}
           <button
             type="button"
@@ -333,7 +374,6 @@ export function ChatInterface() {
 
         <div className="space-y-1 text-sm text-orange-100/65">
           <div className={`flex items-center rounded-lg py-2.5 text-orange-100/85 ${isSidebarCollapsed ? "justify-center" : "gap-3 px-3"}`} title="Chats">
-            <MessageSquare className="h-4 w-4" />
             {!isSidebarCollapsed && "Chats"}
           </div>
           <div className={`flex items-center rounded-lg py-2.5 hover:bg-orange-400/10 ${isSidebarCollapsed ? "justify-center" : "gap-3 px-3"}`} title="Projects">
@@ -371,16 +411,34 @@ export function ChatInterface() {
             ) : chatSessions.length === 0 ? (
               <p className="px-3 py-4 text-xs leading-5 text-orange-100/35">Your conversations will appear here.</p>
             ) : (
-              chatSessions.map((session) => (
-                <button
-                  type="button"
+              chatSessions.filter((session) => !session.archived).sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned))).map((session) => (
+                <div
                   key={session.id}
+                  data-session-menu
                   onClick={() => handleLoadSession(session)}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-orange-100/60 transition hover:bg-orange-400/10 hover:text-orange-50"
+                  className="group relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-orange-100/60 transition hover:bg-orange-400/10 hover:text-orange-50"
                 >
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400/60" />
+                  {session.pinned ? <Pin className="h-3.5 w-3.5 shrink-0 text-orange-300" /> : <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400/60" />}
                   <span className="truncate">{session.title}</span>
-                </button>
+                  <button
+                    type="button"
+                    aria-label={`Actions for ${session.title}`}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      setOpenSessionMenu(openSessionMenu === session.id ? null : session.id)
+                    }}
+                    className="ml-auto rounded-md p-1 text-orange-100/40 opacity-0 transition hover:bg-orange-400/15 hover:text-orange-50 group-hover:opacity-100"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                  {openSessionMenu === session.id && (
+                    <div className="absolute right-2 top-10 z-20 w-52 rounded-xl border border-orange-200/15 bg-[#292522] p-1.5 shadow-2xl">
+                      <button type="button" onClick={() => handleRenameSession(session)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-white/10"><Pencil className="h-4 w-4" />Rename</button>
+                      <button type="button" onClick={() => handleTogglePinSession(session)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-white/10"><Pin className="h-4 w-4" />{session.pinned ? "Unpin" : "Pin"}</button>
+                      <button type="button" onClick={() => { handleDeleteSession(session.id); setOpenSessionMenu(null) }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-red-400 hover:bg-red-400/10"><Trash2 className="h-4 w-4" />Delete</button>
+                    </div>
+                  )}
+                </div>
               ))
             )}
           </div>

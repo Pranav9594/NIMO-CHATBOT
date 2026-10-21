@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Bot, Trash2, X, Plus, ArrowUpRight, Menu } from "lucide-react"
+import { Trash2, X, Plus, ArrowUpRight, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -89,9 +89,6 @@ export function ChatHeader({
             <Menu className="h-5 w-5" />
             <span className="sr-only">Open chat history</span>
           </Button>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-300 via-orange-500 to-orange-800 shadow-[0_0_22px_rgba(245,100,24,0.45)]">
-            <Bot className="h-5 w-5 text-[#241006]" />
-          </div>
           <div>
             <h1 className="text-sm font-semibold tracking-[0.2em] text-orange-50">NIMO</h1>
           </div>
