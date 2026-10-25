@@ -197,4 +197,4 @@ This project is open-source and available under the MIT License.
 
 ---
 
-> Built with ❤️ by [Pranav](https://github.com/Pranav9594)..
+> Built with ❤️ by [Pranav](https://github.com/Pranav9594)
