@@ -5,15 +5,12 @@ import type { FormEvent } from "react"
 import {
   Sparkles,
   Plus,
-  SlidersHorizontal,
-  Lightbulb,
   Mic,
   MicOff,
   Send,
   Loader2,
   FileText,
   X,
-  ChevronDown,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -222,8 +219,8 @@ export function ChatInput({
                 aria-label="Attach file"
                 title="Attach file"
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 38,
+                  height: 38,
                   borderRadius: "50%",
                   background: "rgba(255,255,255,0.05)",
                   border: "1px solid var(--border-subtle)",
@@ -246,20 +243,9 @@ export function ChatInput({
                   el.style.color = "var(--text-secondary)"
                 }}
               >
-                <Plus size={14} strokeWidth={1.5} />
+                <Plus size={16} strokeWidth={1.5} />
               </button>
 
-              <button type="button" className="pill" aria-label="Tools menu" title="Tools">
-                <SlidersHorizontal size={11} strokeWidth={1.5} />
-                <span>Tools</span>
-                <ChevronDown size={10} strokeWidth={1.5} />
-              </button>
-
-              <button type="button" className="pill" aria-label="Deep Think mode" title="Deep Think">
-                <Lightbulb size={11} strokeWidth={1.5} />
-                <span>Deep Think</span>
-                <ChevronDown size={10} strokeWidth={1.5} />
-              </button>
             </div>
 
             {/* Right */}
@@ -272,7 +258,7 @@ export function ChatInput({
                 className={cn("pill", isRecording && "active")}
                 style={isRecording ? { borderColor: "rgba(239,68,68,0.5)", color: "#ef4444" } : {}}
               >
-                {isRecording ? <MicOff size={11} strokeWidth={1.5} /> : <Mic size={11} strokeWidth={1.5} />}
+                {isRecording ? <MicOff size={13} strokeWidth={1.5} /> : <Mic size={13} strokeWidth={1.5} />}
                 <span className="hidden sm:inline">{isRecording ? "Stop" : "Voice"}</span>
               </button>
 
@@ -283,8 +269,8 @@ export function ChatInput({
                 className="send-btn"
               >
                 {isLoading
-                  ? <Loader2 size={16} strokeWidth={1.5} className="animate-spin" style={{ color: "#14161c" }} />
-                  : <Send size={16} strokeWidth={1.5} style={{ color: "#14161c" }} />
+                  ? <Loader2 size={18} strokeWidth={1.5} className="animate-spin" style={{ color: "#14161c" }} />
+                  : <Send size={18} strokeWidth={1.5} style={{ color: "#14161c" }} />
                 }
               </button>
             </div>
