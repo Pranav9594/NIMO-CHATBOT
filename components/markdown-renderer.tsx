@@ -74,7 +74,7 @@ function parseMarkdown(content: string): ParsedBlock[] {
 
 function formatInlineMarkdown(text: string): string {
   return (
-    text
+    escapeHtml(text)
       // Bold
       .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
       // Italic
@@ -103,4 +103,17 @@ function formatInlineMarkdown(text: string): string {
       .replace(/^- (.*?)$/gm, '<li class="ml-4 list-disc">$1</li>')
       .replace(/^(\d+)\. (.*?)$/gm, '<li class="ml-4 list-decimal">$2</li>')
   )
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, character => {
+    const entities: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }
+    return entities[character]
+  })
 }

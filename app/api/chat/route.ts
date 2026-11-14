@@ -3,6 +3,11 @@ interface Message {
   content: string
 }
 
+import { errorResponse, getClientAddress, isRateLimited, rateLimitResponse, requestId } from "@/lib/api-security"
+
+const MAX_MESSAGES = 50
+const MAX_MESSAGE_LENGTH = 12_000
+
 const SYSTEM_PROMPT = `You are NIMO, a friendly and helpful general-purpose AI chatbot. Have natural conversations, answer questions, explain ideas, help with planning, writing, learning, and everyday tasks. Adapt your tone to the user's request and communicate clearly using Markdown when appropriate.
 
 Guidelines:
@@ -13,8 +18,12 @@ Guidelines:
 - Format lists, headers, and emphasis using proper Markdown syntax`
 
 export async function POST(req: Request) {
+  const id = requestId()
   try {
-    const { messages }: { messages: Message[] } = await req.json()
+    if (isRateLimited(`chat:${getClientAddress(req)}`)) return rateLimitResponse()
+
+    const body = await req.json()
+    const messages = body?.messages
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
 
     if (!apiKey) {
@@ -32,7 +41,19 @@ export async function POST(req: Request) {
       })
     }
 
-    if (!messages || messages.length === 0) {
+    if (
+      !Array.isArray(messages) ||
+      messages.length === 0 ||
+      messages.length > MAX_MESSAGES ||
+      messages.some(
+        (message): message is Message =>
+          !message ||
+          (message.role !== "user" && message.role !== "assistant") ||
+          typeof message.content !== "string" ||
+          message.content.length === 0 ||
+          message.content.length > MAX_MESSAGE_LENGTH,
+      )
+    ) {
       return new Response("No messages provided", { status: 400 })
     }
 
@@ -88,8 +109,7 @@ export async function POST(req: Request) {
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    console.error("Chat API error:", message)
-    return new Response(message, { status: 500 })
+    console.error(`[${id}] Chat API error:`, error instanceof Error ? error.message : String(error))
+    return errorResponse("Unable to process the request.", 500, id)
   }
 }

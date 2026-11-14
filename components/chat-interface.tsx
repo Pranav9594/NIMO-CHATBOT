@@ -271,7 +271,7 @@ export function ChatInterface() {
     .sort((a, b) => Number(!!b.pinned) - Number(!!a.pinned))
 
   /* ── Sidebar inner ── */
-  const SidebarContent = ({ collapsed }: { collapsed: boolean }) => (
+  const renderSidebarContent = ({ collapsed }: { collapsed: boolean }) => (
     <div
       style={{
         display: "flex",
@@ -712,7 +712,7 @@ export function ChatInterface() {
         >
           <X size={15} />
         </button>
-        <SidebarContent collapsed={false} />
+        {renderSidebarContent({ collapsed: false })}
       </aside>
 
       {/* App shell */}
@@ -753,7 +753,7 @@ export function ChatInterface() {
               transition: "width 220ms cubic-bezier(.2,.8,.2,1), min-width 220ms cubic-bezier(.2,.8,.2,1)",
             }}
           >
-            <SidebarContent collapsed={isSidebarCollapsed} />
+            {renderSidebarContent({ collapsed: isSidebarCollapsed })}
           </aside>
 
           {/* Main panel */}

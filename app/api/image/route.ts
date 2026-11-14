@@ -1,12 +1,8 @@
+import { errorResponse, getClientAddress, isRateLimited, rateLimitResponse, requestId } from "@/lib/api-security"
+
 /**
  * Image generation via OpenRouter → Gemini image models.
  * Requires OPENROUTER_API_KEY in .env.local with credits loaded.
- *
- * Models tried in order (cheapest first):
- *   google/gemini-3.1-flash-lite-image  — cheapest
- *   google/gemini-2.5-flash-image       — good quality
- *   google/gemini-3.1-flash-image       — higher quality
- *   google/gemini-3-pro-image           — best quality
  */
 
 const MODELS = [
@@ -17,15 +13,19 @@ const MODELS = [
 ]
 
 export async function POST(req: Request) {
+  const id = requestId()
   try {
-    const { prompt } = await req.json()
+    if (isRateLimited(`image:${getClientAddress(req)}`)) return rateLimitResponse()
+
+    const body = await req.json()
+    const prompt = body?.prompt
     const apiKey = process.env.OPENROUTER_API_KEY
 
     if (!apiKey) {
-      return Response.json({ error: "OpenRouter API key not configured. Add OPENROUTER_API_KEY to .env.local." }, { status: 500 })
+      return Response.json({ error: "OpenRouter API key not configured." }, { status: 500 })
     }
-    if (!prompt?.trim()) {
-      return Response.json({ error: "Prompt is required." }, { status: 400 })
+    if (typeof prompt !== "string" || !prompt.trim() || prompt.length > 4_000) {
+      return Response.json({ error: "Prompt is required and must be 4,000 characters or fewer." }, { status: 400 })
     }
 
     let lastError = ""
@@ -55,52 +55,34 @@ export async function POST(req: Request) {
         console.error(`Image model ${model} error:`, errMsg)
         lastError = errMsg
 
-        // No credits → surface clear message immediately
         if (response.status === 402) {
           return Response.json(
-            {
-              error: "Your OpenRouter account has no credits. Add credits at openrouter.ai/settings/credits to enable image generation.",
-              noCredits: true,
-            },
+            { error: "Image generation is temporarily unavailable because the provider account has no credits.", noCredits: true },
             { status: 402 },
           )
         }
 
-        // Model not found → try next
         if (response.status === 404 || response.status === 400) continue
-
-        // Any other error → surface immediately
-        return Response.json({ error: `Image generation failed: ${errMsg}` }, { status: response.status })
+        return Response.json({ error: "Image generation failed. Please try again." }, { status: 502 })
       }
 
       const img = result.data?.[0]
 
       if (img?.b64_json) {
-        return Response.json({
-          imageData: img.b64_json,
-          mimeType: "image/png",
-          caption: null,
-          model,
-        })
+        return Response.json({ imageData: img.b64_json, mimeType: "image/png", caption: null, model })
       }
 
-      // Some models return a URL instead of b64
       if (img?.url) {
-        return Response.json({
-          imageUrl: img.url,
-          mimeType: "image/png",
-          caption: null,
-          model,
-        })
+        return Response.json({ imageUrl: img.url, mimeType: "image/png", caption: null, model })
       }
 
       lastError = "No image in response"
     }
 
-    return Response.json({ error: `All image models failed. Last error: ${lastError}` }, { status: 500 })
+    console.error("All image models failed:", lastError)
+    return errorResponse("Image generation failed. Please try again.", 502, id)
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error)
-    console.error("Image route error:", msg)
-    return Response.json({ error: msg }, { status: 500 })
+    console.error(`[${id}] Image route error:`, error instanceof Error ? error.message : String(error))
+    return errorResponse("Image generation failed. Please try again.", 500, id)
   }
 }

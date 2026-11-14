@@ -128,6 +128,17 @@ Open the app in your browser:
 | ------------ | ------------ | -------- |
 | GOOGLE_GENERATIVE_AI_API_KEY | Google Gemini API key | Yes      |
 | GEMINI_MODEL | Gemini model used for responses | No       |
+| OPENROUTER_API_KEY | OpenRouter key for image generation | No |
+
+Copy `.env.example` to `.env.local` and replace the placeholders locally. Never commit `.env.local` or real credentials.
+
+## Privacy and security
+
+Chat messages and generated session history are stored in the browser's local storage on the current device. They are sent to the configured AI provider only when you submit a chat, image, or video request. Do not enter confidential information unless you have reviewed the provider's terms and retention policies.
+
+Use the clear-chat and delete-session controls to remove locally stored conversations. Clearing browser site data also removes the remaining local history. The app does not currently provide accounts or server-side personal-data storage.
+
+If a real credential was ever committed, rotate it immediately even after removing it, because Git history can retain old values.
 
 ---
 

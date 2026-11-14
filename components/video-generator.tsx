@@ -328,7 +328,7 @@ export function VideoGenerator() {
             <p style={{ fontSize: 12, color: "var(--text-muted)", flex: 1, marginRight: 12 }}>{prompt}</p>
             <a
               href={state.videoUri}
-              download={`nimo-video-${Date.now()}.mp4`}
+              download="nimo-video.mp4"
               target="_blank"
               rel="noopener noreferrer"
               className="pill"

@@ -12,6 +12,8 @@
  *   → { done: true, error: string }
  */
 
+import { errorResponse, getClientAddress, isRateLimited, rateLimitResponse, requestId } from "@/lib/api-security"
+
 const BASE = "https://generativelanguage.googleapis.com/v1beta"
 
 // Try models in priority order
@@ -22,12 +24,18 @@ const VEO_MODELS = [
 ]
 
 export async function POST(req: Request) {
+  const id = requestId()
   try {
-    const { prompt } = await req.json()
+    if (isRateLimited(`video:${getClientAddress(req)}`)) return rateLimitResponse()
+
+    const body = await req.json()
+    const prompt = body?.prompt
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
 
     if (!apiKey) return Response.json({ error: "API key not configured." }, { status: 500 })
-    if (!prompt?.trim()) return Response.json({ error: "Prompt is required." }, { status: 400 })
+    if (typeof prompt !== "string" || !prompt.trim() || prompt.length > 4_000) {
+      return Response.json({ error: "Prompt is required and must be 4,000 characters or fewer." }, { status: 400 })
+    }
 
     for (const model of VEO_MODELS) {
       const response = await fetch(
@@ -58,10 +66,8 @@ export async function POST(req: Request) {
           )
         }
 
-        return Response.json(
-          { error: `Video generation failed (${response.status}). ${errText}` },
-          { status: response.status },
-        )
+        console.error(`Veo request failed (${response.status}):`, errText)
+        return errorResponse("Video generation failed. Please try again.", 502, id)
       }
 
       const result = await response.json()
@@ -81,20 +87,24 @@ export async function POST(req: Request) {
       { status: 404 },
     )
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error)
-    console.error("Video POST error:", msg)
-    return Response.json({ error: msg }, { status: 500 })
+    console.error("Video POST error:", error instanceof Error ? error.message : String(error))
+    return errorResponse("Video generation failed. Please try again.", 500, id)
   }
 }
 
 export async function GET(req: Request) {
+  const id = requestId()
   try {
+    if (isRateLimited(`video-poll:${getClientAddress(req)}`)) return rateLimitResponse()
+
     const { searchParams } = new URL(req.url)
     const op = searchParams.get("op")
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
 
     if (!apiKey) return Response.json({ error: "API key not configured." }, { status: 500 })
-    if (!op) return Response.json({ error: "op parameter required." }, { status: 400 })
+    if (!op || !/^operations\/[A-Za-z0-9._-]+$/.test(op)) {
+      return Response.json({ error: "Invalid operation." }, { status: 400 })
+    }
 
     const response = await fetch(
       `${BASE}/${op}?key=${encodeURIComponent(apiKey)}`,
@@ -102,8 +112,8 @@ export async function GET(req: Request) {
     )
 
     if (!response.ok) {
-      const err = await response.text()
-      return Response.json({ error: `Poll failed (${response.status}): ${err}` }, { status: response.status })
+      console.error(`Veo poll failed (${response.status}):`, await response.text())
+      return errorResponse("Video status check failed.", 502, id)
     }
 
     const result = await response.json()
@@ -124,8 +134,7 @@ export async function GET(req: Request) {
 
     return Response.json({ done: true, videoUri: video.uri, mimeType: video.mimeType ?? "video/mp4" })
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error)
-    console.error("Video GET error:", msg)
-    return Response.json({ error: msg }, { status: 500 })
+    console.error("Video GET error:", error instanceof Error ? error.message : String(error))
+    return errorResponse("Video status check failed.", 500, id)
   }
 }
