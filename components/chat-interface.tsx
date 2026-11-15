@@ -535,17 +535,17 @@ export function ChatInterface() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: 20,
-                      height: 20,
+                      width: 28,
+                      height: 24,
                       borderRadius: 4,
                       padding: 2,
-                      color: "var(--text-muted)",
-                      background: "none",
-                      border: "none",
+                      color: "var(--text-primary)",
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid var(--border-subtle)",
                       cursor: "pointer",
                     }}
                   >
-                    <MoreHorizontal size={13} strokeWidth={1.5} />
+                    <MoreHorizontal size={16} strokeWidth={2} />
                   </button>
                 </>
               ) : (
@@ -575,18 +575,20 @@ export function ChatInterface() {
                       setOpenSessionMenu(openSessionMenu === session.id ? null : session.id)
                     }}
                     style={{
+                      width: 28,
+                      height: 24,
                       marginLeft: "auto",
                       flexShrink: 0,
                       borderRadius: 4,
                       padding: 2,
-                      color: "var(--text-muted)",
-                      background: "none",
-                      border: "none",
+                      color: "var(--text-primary)",
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid var(--border-subtle)",
                       cursor: "pointer",
                       opacity: 1,
                     }}
                   >
-                    <MoreHorizontal size={13} strokeWidth={1.5} />
+                    <MoreHorizontal size={16} strokeWidth={2} />
                   </button>
                   {openSessionMenu === session.id && (
                     <div
