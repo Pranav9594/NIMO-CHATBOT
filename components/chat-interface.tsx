@@ -493,8 +493,8 @@ export function ChatInterface() {
                 display: "flex",
                 alignItems: "center",
                 gap: collapsed ? 0 : 7,
-                padding: collapsed ? 0 : "0 8px",
-                justifyContent: collapsed ? "center" : "flex-start",
+                padding: collapsed ? "0 2px" : "0 8px",
+                justifyContent: collapsed ? "space-between" : "flex-start",
                 marginBottom: 1,
                 borderRadius: 8,
                 cursor: "pointer",
@@ -511,17 +511,43 @@ export function ChatInterface() {
               }}
             >
               {collapsed ? (
-                <span
-                  title={session.title}
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: session.pinned ? "var(--accent-teal)" : "rgba(255,255,255,0.3)",
-                    flexShrink: 0,
-                    display: "inline-block",
-                  }}
-                />
+                <>
+                  <span
+                    title={session.title}
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: session.pinned ? "var(--accent-teal)" : "rgba(255,255,255,0.3)",
+                      flexShrink: 0,
+                      display: "inline-block",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    aria-label={`Options for ${session.title}`}
+                    onClick={e => {
+                      e.stopPropagation()
+                      setIsSidebarCollapsed(false)
+                      setOpenSessionMenu(session.id)
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 20,
+                      height: 20,
+                      borderRadius: 4,
+                      padding: 2,
+                      color: "var(--text-muted)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <MoreHorizontal size={13} strokeWidth={1.5} />
+                  </button>
+                </>
               ) : (
                 <>
                   {session.pinned
