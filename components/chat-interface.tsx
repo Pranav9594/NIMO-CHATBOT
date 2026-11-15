@@ -607,6 +607,31 @@ export function ChatInterface() {
                     >
                       <button
                         type="button"
+                        onClick={e => {
+                          e.stopPropagation()
+                          handleDeleteSession(session.id)
+                        }}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          padding: "7px 12px",
+                          fontSize: 12,
+                          color: "#ef4444",
+                          background: "none",
+                          border: "none",
+                          borderRadius: 8,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                        }}
+                        onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.1)")}
+                        onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "none")}
+                      >
+                        <Trash2 size={12} />Delete
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => handleRenameSession(session)}
                         style={{
                           width: "100%",
@@ -648,31 +673,6 @@ export function ChatInterface() {
                         onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "none")}
                       >
                         <Pin size={12} />{session.pinned ? "Unpin" : "Pin"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={e => {
-                          e.stopPropagation()
-                          handleDeleteSession(session.id)
-                        }}
-                        style={{
-                          width: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          padding: "7px 12px",
-                          fontSize: 12,
-                          color: "#ef4444",
-                          background: "none",
-                          border: "none",
-                          borderRadius: 8,
-                          cursor: "pointer",
-                          fontFamily: "inherit",
-                        }}
-                        onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.1)")}
-                        onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "none")}
-                      >
-                        <Trash2 size={12} />Delete
                       </button>
                     </div>
                   )}
