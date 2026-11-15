@@ -1,15 +1,22 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
+import { Mulish } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
+
+const mulish = Mulish({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
+})
 
 export const metadata: Metadata = {
   title: "NIMO - AI Assistant",
   description: "A clean, interactive AI-powered chatbot",
   generator: "v0.app",
   icons: {
-    icon: "/nimo-favicon.png",
-    apple: "/nimo-favicon.png",
+    icon: "/nimo-logo.png",
+    apple: "/nimo-logo.png",
   },
 }
 
@@ -26,15 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="antialiased" style={{ fontFamily: "'Mulish','Inter',system-ui,sans-serif" }}>
+      <body className={`antialiased ${mulish.className}`} style={{ fontFamily: "'Mulish','Inter',system-ui,sans-serif" }}>
         {children}
         <Analytics />
       </body>

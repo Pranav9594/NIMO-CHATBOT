@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { SlidersHorizontal, ChevronDown, Menu } from "lucide-react"
+import { SlidersHorizontal, ChevronDown, Menu, User } from "lucide-react"
 
 interface TopBarProps {
   onToggleSidebar: () => void
@@ -17,7 +17,7 @@ export function TopBar({
   isSidebarCollapsed,
   onMobileMenuOpen,
 }: TopBarProps) {
-  const [activeNav, setActiveNav] = useState<"dashboard" | "settings" | "help">("dashboard")
+  const [activeNav, setActiveNav] = useState<"dashboard">("dashboard")
 
   return (
     <header
@@ -74,8 +74,8 @@ export function TopBar({
       <div className="flex items-center gap-4">
         {/* Nav links */}
         <nav aria-label="Main navigation" className="hidden sm:flex items-center gap-4">
-          {(["dashboard", "settings", "help"] as const).map(key => {
-            const labels = { dashboard: "Dashboard", settings: "Settings", help: "Help & Support" }
+          {(["dashboard"] as const).map(key => {
+            const labels = { dashboard: "Dashboard" }
             const isActive = activeNav === key
             return (
               <button
@@ -129,7 +129,7 @@ export function TopBar({
             justifyContent: "center",
           }}
         >
-          P
+          <User size={17} strokeWidth={1.7} />
         </button>
       </div>
     </header>

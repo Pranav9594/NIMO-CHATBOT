@@ -64,10 +64,14 @@ export function ChatInterface() {
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([])
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(320)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [openSessionMenu, setOpenSessionMenu] = useState<string | null>(null)
   const [activeFeature, setActiveFeature] = useState<FeatureKey | null>(null)
   const [showClearDialog, setShowClearDialog] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const isResizingSidebar = useRef(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
@@ -111,6 +115,25 @@ export function ChatInterface() {
       document.removeEventListener("keydown", esc)
     }
   }, [openSessionMenu])
+
+  useEffect(() => {
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!isResizingSidebar.current) return
+      setSidebarWidth(Math.min(420, Math.max(180, e.clientX - 12)))
+    }
+    const stopResizing = () => {
+      isResizingSidebar.current = false
+      document.body.style.cursor = ""
+      document.body.style.userSelect = ""
+    }
+
+    document.addEventListener("pointermove", handlePointerMove)
+    document.addEventListener("pointerup", stopResizing)
+    return () => {
+      document.removeEventListener("pointermove", handlePointerMove)
+      document.removeEventListener("pointerup", stopResizing)
+    }
+  }, [])
 
   /* ── Helpers ── */
   const getTitle = (ml: Message[]) => {
@@ -272,7 +295,7 @@ export function ChatInterface() {
   }
 
   const sortedSessions = chatSessions
-    .filter(s => !s.archived)
+    .filter(s => !s.archived && s.title.toLowerCase().includes(searchQuery.trim().toLowerCase()))
     .sort((a, b) => Number(!!b.pinned) - Number(!!a.pinned))
 
   /* ── Sidebar inner ── */
@@ -282,6 +305,7 @@ export function ChatInterface() {
         display: "flex",
         flexDirection: "column",
         height: "100%",
+        width: "100%",
         gap: 0,
       }}
     >
@@ -297,10 +321,10 @@ export function ChatInterface() {
       >
         {!collapsed && (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <NimoOrb size={24} />
+            <NimoOrb size={26} />
             <span
               style={{
-                fontSize: 14,
+                fontSize: 20,
                 fontWeight: 800,
                 fontStyle: "italic",
                 color: "var(--text-primary)",
@@ -314,9 +338,13 @@ export function ChatInterface() {
         <button
           type="button"
           aria-label="Search"
+          onClick={() => {
+            setIsSearchOpen(open => !open)
+            if (collapsed) setIsSidebarCollapsed(false)
+          }}
           style={{
-            width: 32,
-            height: 32,
+            width: 26,
+            height: 26,
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",
@@ -335,13 +363,38 @@ export function ChatInterface() {
           }}
           onMouseLeave={e => {
             const el = e.currentTarget as HTMLElement
-            el.style.background = "transparent"
+            el.style.background = "rgba(255,255,255,0.025)"
             el.style.color = "var(--text-secondary)"
           }}
         >
-          <Search size={15} strokeWidth={1.5} />
+          <Search size={13} strokeWidth={1.5} />
         </button>
       </div>
+
+      {isSearchOpen && !collapsed && (
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Search chats"
+          aria-label="Search chats"
+          autoFocus
+          style={{
+            width: "100%",
+            height: 30,
+            marginBottom: 10,
+            padding: "0 10px",
+            borderRadius: 8,
+            border: "1px solid var(--border-subtle)",
+            background: "rgba(255,255,255,0.04)",
+            color: "var(--text-primary)",
+            outline: "none",
+            fontSize: 12,
+            fontFamily: "inherit",
+            boxSizing: "border-box",
+          }}
+        />
+      )}
 
       {/* New Chat */}
       <button
@@ -357,15 +410,15 @@ export function ChatInterface() {
           gap: 8,
           paddingLeft: collapsed ? 0 : 12,
           paddingRight: collapsed ? 0 : 12,
-          marginBottom: 20,
+          marginBottom: 14,
           flexShrink: 0,
         }}
         aria-label="New Chat"
         title="New Chat"
       >
-        <Plus size={14} strokeWidth={1.5} style={{ color: "var(--accent-teal)", flexShrink: 0 }} />
+        <Plus size={12} strokeWidth={1.5} style={{ color: "var(--accent-teal)", flexShrink: 0 }} />
         {!collapsed && (
-          <span style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-primary)" }}>New Chat</span>
+          <span style={{ fontSize: 15, fontWeight: 500, color: "var(--text-primary)" }}>New Chat</span>
         )}
       </button>
 
@@ -373,12 +426,12 @@ export function ChatInterface() {
       {!collapsed && (
         <div
           style={{
-            fontSize: 10,
+            fontSize: 14,
             fontWeight: 600,
             letterSpacing: "0.14em",
             textTransform: "uppercase",
             color: "var(--text-muted)",
-            marginBottom: 10,
+            marginBottom: 7,
             flexShrink: 0,
           }}
         >
@@ -400,7 +453,7 @@ export function ChatInterface() {
               aria-label={item.label}
               className={isActive ? "nav-active-item" : ""}
               style={{
-                width: "100%",
+                width: 160,
                 height: 34,
                 display: "flex",
                 alignItems: "center",
@@ -409,7 +462,7 @@ export function ChatInterface() {
                 padding: collapsed ? 0 : `0 ${isActive ? 14 : 10}px`,
                 marginBottom: 2,
                 borderRadius: 8,
-                fontSize: 12,
+                fontSize: 16,
                 fontWeight: 500,
                 color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
                 background: isActive ? "rgba(255,255,255,0.08)" : "transparent",
@@ -433,7 +486,7 @@ export function ChatInterface() {
                 }
               }}
             >
-              <Icon size={16} strokeWidth={1.5} style={{ flexShrink: 0 }} />
+              <Icon size={14} strokeWidth={1.5} style={{ flexShrink: 0 }} />
               {!collapsed && item.label}
             </button>
           )
@@ -443,7 +496,7 @@ export function ChatInterface() {
       {/* Divider */}
       <div
         style={{
-          margin: "20px auto",
+          margin: "12px auto",
           width: collapsed ? "60%" : "40%",
           height: 1,
           background: "var(--border-subtle)",
@@ -455,12 +508,12 @@ export function ChatInterface() {
       {!collapsed && (
         <div
           style={{
-            fontSize: 10,
+            fontSize: 14,
             fontWeight: 600,
             letterSpacing: "0.14em",
             textTransform: "uppercase",
             color: "var(--text-muted)",
-            marginBottom: 10,
+            marginBottom: 7,
             flexShrink: 0,
           }}
         >
@@ -471,7 +524,7 @@ export function ChatInterface() {
       {/* Chat list */}
       <div
         className="chat-scroll"
-        style={{ flex: 1, overflowY: "auto", minHeight: 0 }}
+        style={{ flex: 1, width: "100%", overflowY: "auto", minHeight: 0 }}
       >
         {sortedSessions.length === 0
           ? (!collapsed && (
@@ -489,21 +542,27 @@ export function ChatInterface() {
               onKeyDown={e => e.key === "Enter" && handleLoadSession(session)}
               className="group"
               style={{
-                height: 28,
+                height: 36,
+                width: "100%",
+                maxWidth: "100%",
                 display: "flex",
                 alignItems: "center",
                 gap: collapsed ? 0 : 7,
-                padding: collapsed ? "0 2px" : "0 8px",
+                padding: collapsed ? "0 4px" : "0 7px",
                 justifyContent: collapsed ? "space-between" : "flex-start",
-                marginBottom: 1,
-                borderRadius: 8,
+                marginBottom: 3,
+                borderRadius: 9,
+                border: "none",
+                background: "transparent",
+                boxSizing: "border-box",
+                overflow: "visible",
                 cursor: "pointer",
                 position: "relative",
                 transition: "background 150ms",
               }}
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLElement
-                el.style.background = "rgba(255,255,255,0.05)"
+                el.style.background = "rgba(255,255,255,0.08)"
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLElement
@@ -515,8 +574,8 @@ export function ChatInterface() {
                   <span
                     title={session.title}
                     style={{
-                      width: 6,
-                      height: 6,
+                      width: 4,
+                      height: 4,
                       borderRadius: "50%",
                       background: session.pinned ? "var(--accent-teal)" : "rgba(255,255,255,0.3)",
                       flexShrink: 0,
@@ -535,8 +594,8 @@ export function ChatInterface() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: 28,
-                      height: 24,
+                      width: 20,
+                      height: 20,
                       borderRadius: 4,
                       padding: 2,
                       color: "var(--text-primary)",
@@ -545,7 +604,7 @@ export function ChatInterface() {
                       cursor: "pointer",
                     }}
                   >
-                    <MoreHorizontal size={16} strokeWidth={2} />
+                    <MoreHorizontal size={11} strokeWidth={2} />
                   </button>
                 </>
               ) : (
@@ -556,8 +615,10 @@ export function ChatInterface() {
                   }
                   <span
                     style={{
-                      flex: 1,
-                      fontSize: 11.5,
+                      flex: "0 1 auto",
+                      fontSize: 15,
+                      minWidth: 0,
+                      maxWidth: "calc(100% - 38px)",
                       color: "var(--text-muted)",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -574,10 +635,13 @@ export function ChatInterface() {
                       e.stopPropagation()
                       setOpenSessionMenu(openSessionMenu === session.id ? null : session.id)
                     }}
+                    className="opacity-0 transition-opacity group-hover:opacity-100"
                     style={{
-                      width: 28,
-                      height: 24,
-                      marginLeft: "auto",
+                      position: "absolute",
+                      right: 8,
+                      top: "50%",
+                      width: 20,
+                      height: 20,
                       flexShrink: 0,
                       borderRadius: 4,
                       padding: 2,
@@ -585,17 +649,18 @@ export function ChatInterface() {
                       background: "rgba(255,255,255,0.08)",
                       border: "1px solid var(--border-subtle)",
                       cursor: "pointer",
-                      opacity: 1,
+                      opacity: openSessionMenu === session.id ? 1 : undefined,
+                      transform: "translateY(-50%)",
                     }}
                   >
-                    <MoreHorizontal size={16} strokeWidth={2} />
+                    <MoreHorizontal size={11} strokeWidth={2} />
                   </button>
                   {openSessionMenu === session.id && (
                     <div
                       style={{
                         position: "absolute",
                         right: 0,
-                        top: 30,
+                        top: 34,
                         zIndex: 50,
                         width: 176,
                         background: "#23262e",
@@ -713,9 +778,9 @@ export function ChatInterface() {
           bottom: 0,
           left: 0,
           zIndex: 50,
-          width: 260,
+          width: 200,
           background: "var(--bg-sidebar)",
-          padding: "16px 14px",
+          padding: "10px",
           borderRadius: "0 24px 24px 0",
           transform: isMobileSidebarOpen ? "translateX(0)" : "translateX(-100%)",
           transition: "transform 300ms cubic-bezier(.2,.8,.2,1)",
@@ -753,7 +818,8 @@ export function ChatInterface() {
       <div
         style={{
           height: "100vh",
-          padding: "12px",
+          width: "100%",
+          padding: "12px 0",
           background: "var(--bg-app)",
           display: "flex",
           alignItems: "stretch",
@@ -776,18 +842,41 @@ export function ChatInterface() {
             className="sidebar-animate hidden lg:flex"
             aria-label="Navigation sidebar"
             style={{
-              width: isSidebarCollapsed ? 72 : 240,
-              minWidth: isSidebarCollapsed ? 72 : 220,
-              maxWidth: 260,
+              width: isSidebarCollapsed ? 60 : sidebarWidth,
+              minWidth: isSidebarCollapsed ? 60 : sidebarWidth,
+              maxWidth: isSidebarCollapsed ? 60 : sidebarWidth,
               background: "var(--bg-sidebar)",
               borderRadius: "24px 0 0 24px",
-              padding: "16px 14px",
+              padding: "10px",
               flexShrink: 0,
               overflow: "hidden",
+              position: "relative",
               transition: "width 220ms cubic-bezier(.2,.8,.2,1), min-width 220ms cubic-bezier(.2,.8,.2,1)",
             }}
           >
             {renderSidebarContent({ collapsed: isSidebarCollapsed })}
+            {!isSidebarCollapsed && (
+              <div
+                role="separator"
+                aria-orientation="vertical"
+                aria-label="Resize sidebar"
+                onPointerDown={e => {
+                  e.preventDefault()
+                  isResizingSidebar.current = true
+                  document.body.style.cursor = "col-resize"
+                  document.body.style.userSelect = "none"
+                }}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: -3,
+                  bottom: 0,
+                  width: 6,
+                  cursor: "col-resize",
+                  zIndex: 20,
+                }}
+              />
+            )}
           </aside>
 
           {/* Main panel */}
@@ -855,12 +944,7 @@ export function ChatInterface() {
                   <VideoGenerator />
                 </div>
               ) : messages.length === 0 ? (
-                <WelcomeScreen
-                  onSuggestion={text => {
-                    setInputValue(text)
-                    sendMessage(text)
-                  }}
-                />
+                <WelcomeScreen />
               ) : (
                 <div
                   style={{

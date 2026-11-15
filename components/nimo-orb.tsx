@@ -1,15 +1,13 @@
 "use client"
 
+import Image from "next/image"
+
 interface NimoOrbProps {
   size?: number
   className?: string
   hero?: boolean
 }
 
-/**
- * NIMO glass-orb — teal/green/blue glossy sphere built from
- * layered CSS radial-gradients + a specular highlight div.
- */
 export function NimoOrb({ size = 24, className = "", hero = false }: NimoOrbProps) {
   const s = hero ? 72 : size
 
@@ -28,55 +26,18 @@ export function NimoOrb({ size = 24, className = "", hero = false }: NimoOrbProp
       }}
       aria-hidden="true"
     >
-      {/* Base sphere */}
-      <div
+      <Image
+        src="/nimo-logo.png"
+        alt=""
+        width={s}
+        height={s}
+        priority={hero}
         style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: "50%",
-          background: `radial-gradient(circle at 35% 32%,
-            #8ef0e6 0%,
-            #4fd1c5 18%,
-            #35b8aa 32%,
-            #2a90a8 50%,
-            #174a7a 72%,
-            #0b1c38 100%
-          )`,
-        }}
-      />
-      {/* Dark core */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: "50%",
-          background: "radial-gradient(circle at 65% 72%, rgba(4,8,22,0.62) 0%, transparent 54%)",
-        }}
-      />
-      {/* Top-left specular highlight */}
-      <div
-        style={{
-          position: "absolute",
-          top: "7%",
-          left: "11%",
-          width: "46%",
-          height: "38%",
-          borderRadius: "50%",
-          background: `radial-gradient(ellipse at 42% 36%,
-            rgba(255,255,255,0.78) 0%,
-            rgba(255,255,255,0.14) 55%,
-            transparent 100%
-          )`,
-          transform: "rotate(-18deg)",
-        }}
-      />
-      {/* Rim light bottom-right */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: "50%",
-          background: "radial-gradient(circle at 76% 76%, rgba(90,209,230,0.26) 0%, transparent 44%)",
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          display: "block",
+          filter: "brightness(1.2) saturate(1.45) contrast(1.08)",
         }}
       />
     </div>
