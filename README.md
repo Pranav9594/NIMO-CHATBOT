@@ -1,6 +1,6 @@
 # ✨ NIMO – Conversational AI Chatbot
-<img width="1907" height="868" alt="Screenshot 2026-11-15 004959" src="https://github.com/user-attachments/assets/eb5b559c-f15b-415d-96e0-795be1c91855" />
-
+[<img width="1907" height="868" alt="Screenshot 2026-11-15 004959" src="https://github.com/user-attachments/assets/eb5b559c-f15b-415d-96e0-795be1c91855" />
+](https://nt6vk9qb-3000.inc1.devtunnels.ms/)
 
 ### NIMO is a modern, feature-rich AI chatbot built with Next.js, React, Tailwind, and Gemini. It offers natural conversations for questions, ideas, writing, learning, planning, and everyday tasks in a smooth and polished dark UI.
 
