@@ -557,10 +557,8 @@ export function ChatInterface() {
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      opacity: 0,
-                      transition: "opacity 150ms",
+                      opacity: 1,
                     }}
-                    className="group-hover:opacity-100"
                   >
                     <MoreHorizontal size={13} strokeWidth={1.5} />
                   </button>
