@@ -199,7 +199,12 @@ export function ChatInterface() {
 
   const handleDeleteSession = (id: string) => {
     setChatSessions(prev => prev.filter(s => s.id !== id))
-    if (currentSessionId === id) { setMessages([]); setCurrentSessionId(null) }
+    setOpenSessionMenu(null)
+    if (currentSessionId === id) {
+      setMessages([])
+      setCurrentSessionId(null)
+      localStorage.removeItem(STORAGE_KEY)
+    }
   }
 
   const handleRenameSession = (session: ChatSession) => {
@@ -620,7 +625,10 @@ export function ChatInterface() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => { handleDeleteSession(session.id); setOpenSessionMenu(null) }}
+                        onClick={e => {
+                          e.stopPropagation()
+                          handleDeleteSession(session.id)
+                        }}
                         style={{
                           width: "100%",
                           display: "flex",
