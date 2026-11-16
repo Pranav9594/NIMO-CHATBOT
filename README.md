@@ -1,4 +1,4 @@
-# ✨ NIMO – Conversational AI Chatbot
+#NIMO – Conversational AI Chatbot
 <img width="1906" height="885" alt="image" src="https://github.com/user-attachments/assets/01226bd3-fff5-4817-b18d-b777e82b1010" />
 
 
